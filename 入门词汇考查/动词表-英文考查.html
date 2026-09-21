@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>造句专用动词表 · 英文考查</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card-bg: #ffffff;
+    --text: #1c1e21;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --accent-2: #4f46e5;
+    --good: #16a34a;
+    --good-bg: #ecfdf3;
+    --bad: #dc2626;
+    --bad-bg: #fef2f2;
+    --pill-bg: #eef2ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111318;
+      --card-bg: #1b1e24;
+      --text: #e8eaed;
+      --muted: #9aa1ac;
+      --border: #2b2f38;
+      --accent: #60a5fa;
+      --accent-2: #818cf8;
+      --good: #4ade80;
+      --good-bg: #0f2a1a;
+      --bad: #f87171;
+      --bad-bg: #2a1414;
+      --pill-bg: #1e2436;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+  .setup-card, .quiz-card, .done-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .deck-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0 20px; }
+  .deck-btn {
+    text-align: left;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--pill-bg);
+    color: var(--text);
+    font-size: 0.98rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .deck-btn:hover { border-color: var(--accent); }
+  .deck-btn .count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+  .opt-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 0.9rem; color: var(--muted); }
+  .opt-row input { accent-color: var(--accent); }
+
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.85rem; color: var(--muted); }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 4px; margin: 0 12px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .25s ease; }
+
+  .prompt-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+  .prompt-cn { font-size: 1.6rem; font-weight: 600; line-height: 1.4; margin-bottom: 22px; white-space: pre-line; }
+
+  input[type=text] {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  button.primary, button.secondary {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.primary { background: var(--accent); color: white; }
+  button.primary:active { background: var(--accent-2); }
+  button.secondary { background: var(--pill-bg); color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; display: none; }
+  .feedback.show { display: block; }
+  .feedback.good { background: var(--good-bg); color: var(--good); }
+  .feedback.bad { background: var(--bad-bg); color: var(--bad); }
+  .feedback .answer { color: var(--text); font-weight: 600; }
+
+  .stat-row { display: flex; gap: 16px; font-size: 0.85rem; color: var(--muted); margin-top: 16px; }
+  .stat-row b { color: var(--text); }
+
+  .done-card { text-align: center; }
+  .done-card .big { font-size: 2.2rem; margin-bottom: 6px; }
+  .link-back { display: block; text-align: center; margin-top: 18px; color: var(--muted); font-size: 0.85rem; cursor: pointer; }
+  [hidden] { display: none !important; }
+
+  .wrong-book { text-align: left; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .wrong-book-title { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+  .wrong-list { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .wrong-item { display: flex; justify-content: space-between; gap: 12px; background: var(--bad-bg); border-radius: 8px; padding: 8px 12px; font-size: 0.9rem; }
+  .wrong-item .cn { color: var(--text); }
+  .wrong-item .en { color: var(--bad); font-weight: 600; white-space: nowrap; }
+  button.review {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bad);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>造句专用动词表 · 英文考查</h1>
+  <div class="subtitle">共 96 个常用动词（不及物 26 个 + 及物 70 个）</div>
+
+  <div id="setup" class="setup-card">
+    <div style="font-weight:600; margin-bottom: 4px;">选择练习内容</div>
+    <div style="font-size:0.85rem; color: var(--muted);">看中文提示，写出对应的英文；答对或查看答案后，需手动点击"下一题"。做错的词会被记入错题本，可在完成后针对错题单独再考。</div>
+    <div class="deck-list" id="deckList"></div>
+    <label class="opt-row"><input type="checkbox" id="shuffleOpt" checked> 打乱顺序</label>
+  </div>
+
+  <div id="quiz" class="quiz-card" hidden>
+    <div class="top-bar">
+      <span id="progressText">1 / 1</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span id="deckTag"></span>
+    </div>
+    <div class="prompt-label" id="promptLabel">请写出对应的英文</div>
+    <div class="prompt-cn" id="promptCn"></div>
+    <input type="text" id="answerInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="在此输入英文...">
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row" id="answerRow">
+      <button class="secondary" id="skipBtn">跳过（看答案）</button>
+      <button class="primary" id="submitBtn">提交</button>
+    </div>
+    <div class="btn-row" id="nextRow" hidden>
+      <button class="primary" id="nextBtn">下一题 →</button>
+    </div>
+    <div class="stat-row">
+      <span>正确 <b id="correctCount">0</b></span>
+      <span>错误 <b id="wrongCount">0</b></span>
+      <span>剩余 <b id="remainCount">0</b></span>
+    </div>
+    <div class="link-back" id="backBtn">← 返回选择</div>
+  </div>
+
+  <div id="done" class="done-card" hidden>
+    <div class="big" id="doneEmoji">🎉</div>
+    <div style="font-size:1.2rem; font-weight:600;" id="doneTitle">全部完成！</div>
+    <div style="color:var(--muted); margin-top:6px;" id="doneStats"></div>
+    <button class="review" id="reviewBtn" hidden>针对错题再考一次</button>
+    <div class="btn-row">
+      <button class="secondary" id="restartBtn">再练一次（全部）</button>
+      <button class="primary" id="chooseAnotherBtn">选择其他内容</button>
+    </div>
+    <div class="wrong-book" id="wrongBook" hidden>
+      <div class="wrong-book-title">📖 错题本 · 请记住这些词</div>
+      <div class="wrong-list" id="wrongList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DECKS = [{"name": "只考原形", "cards": [{"cn": "洗澡", "en": "bathe", "tag": ""}, {"cn": "死", "en": "die", "tag": ""}, {"cn": "哭", "en": "cry", "tag": ""}, {"cn": "工作", "en": "work", "tag": ""}, {"cn": "睡觉", "en": "sleep", "tag": ""}, {"cn": "坐", "en": "sit", "tag": ""}, {"cn": "站立", "en": "stand", "tag": ""}, {"cn": "跑", "en": "run", "tag": ""}, {"cn": "休息", "en": "rest", "tag": ""}, {"cn": "居住", "en": "live", "tag": ""}, {"cn": "大笑", "en": "laugh", "tag": ""}, {"cn": "微笑", "en": "smile", "tag": ""}, {"cn": "跳跃", "en": "jump", "tag": ""}, {"cn": "走", "en": "go", "tag": ""}, {"cn": "飞", "en": "fly", "tag": ""}, {"cn": "游泳", "en": "swim", "tag": ""}, {"cn": "步行", "en": "walk", "tag": ""}, {"cn": "旅行", "en": "travel", "tag": ""}, {"cn": "留下", "en": "stay", "tag": ""}, {"cn": "掉下", "en": "fall", "tag": ""}, {"cn": "跳舞", "en": "dance", "tag": ""}, {"cn": "咳嗽", "en": "cough", "tag": ""}, {"cn": "来", "en": "come", "tag": ""}, {"cn": "聊天", "en": "chat", "tag": ""}, {"cn": "看", "en": "look", "tag": ""}, {"cn": "听", "en": "listen", "tag": ""}, {"cn": "烘烤", "en": "bake", "tag": ""}, {"cn": "打", "en": "beat", "tag": ""}, {"cn": "开始", "en": "begin", "tag": ""}, {"cn": "相信", "en": "believe", "tag": ""}, {"cn": "借入", "en": "borrow", "tag": ""}, {"cn": "打破", "en": "break", "tag": ""}, {"cn": "带来", "en": "bring", "tag": ""}, {"cn": "刷", "en": "brush", "tag": ""}, {"cn": "买", "en": "buy", "tag": ""}, {"cn": "打电话", "en": "call", "tag": ""}, {"cn": "抓住", "en": "catch", "tag": ""}, {"cn": "爬", "en": "climb", "tag": ""}, {"cn": "梳理", "en": "comb", "tag": ""}, {"cn": "煮", "en": "cook", "tag": ""}, {"cn": "抄写", "en": "copy", "tag": ""}, {"cn": "改正", "en": "correct", "tag": ""}, {"cn": "割，切", "en": "cut", "tag": ""}, {"cn": "讨论", "en": "discuss", "tag": ""}, {"cn": "做", "en": "do", "tag": ""}, {"cn": "画", "en": "draw", "tag": ""}, {"cn": "喝", "en": "drink", "tag": ""}, {"cn": "驾驶", "en": "drive", "tag": ""}, {"cn": "挣,赚", "en": "earn", "tag": ""}, {"cn": "吃", "en": "eat", "tag": ""}, {"cn": "发现", "en": "find", "tag": ""}, {"cn": "完成", "en": "finish", "tag": ""}, {"cn": "跟随", "en": "follow", "tag": ""}, {"cn": "忘记", "en": "forget", "tag": ""}, {"cn": "得到", "en": "get", "tag": ""}, {"cn": "给", "en": "give", "tag": ""}, {"cn": "猜测", "en": "guess", "tag": ""}, {"cn": "恨", "en": "hate", "tag": ""}, {"cn": "听到", "en": "hear", "tag": ""}, {"cn": "帮助", "en": "help", "tag": ""}, {"cn": "打", "en": "hit", "tag": ""}, {"cn": "握住", "en": "hold", "tag": ""}, {"cn": "伤害", "en": "hurt", "tag": ""}, {"cn": "介绍", "en": "introduce", "tag": ""}, {"cn": "邀请", "en": "invite", "tag": ""}, {"cn": "加入", "en": "join", "tag": ""}, {"cn": "保持", "en": "keep", "tag": ""}, {"cn": "杀死", "en": "kill", "tag": ""}, {"cn": "敲", "en": "knock", "tag": ""}, {"cn": "知道", "en": "know", "tag": ""}, {"cn": "学习", "en": "learn", "tag": ""}, {"cn": "离开", "en": "leave", "tag": ""}, {"cn": "借出", "en": "lend", "tag": ""}, {"cn": "喜欢", "en": "like", "tag": ""}, {"cn": "锁", "en": "lock", "tag": ""}, {"cn": "丢失", "en": "lose", "tag": ""}, {"cn": "爱", "en": "love", "tag": ""}, {"cn": "制造", "en": "make", "tag": ""}, {"cn": "需要", "en": "need", "tag": ""}, {"cn": "遇见", "en": "meet", "tag": ""}, {"cn": "思念", "en": "miss", "tag": ""}, {"cn": "移动", "en": "move", "tag": ""}, {"cn": "娶，嫁", "en": "marry", "tag": ""}, {"cn": "打开", "en": "open", "tag": ""}, {"cn": "拥有", "en": "own", "tag": ""}, {"cn": "支付", "en": "pay", "tag": ""}, {"cn": "通过", "en": "pass", "tag": ""}, {"cn": "捡", "en": "pick", "tag": ""}, {"cn": "拒绝", "en": "refuse", "tag": ""}, {"cn": "惩罚", "en": "punish", "tag": ""}, {"cn": "放", "en": "put", "tag": ""}, {"cn": "推", "en": "push", "tag": ""}, {"cn": "说", "en": "speak", "tag": ""}, {"cn": "支持", "en": "support", "tag": ""}, {"cn": "开始", "en": "start", "tag": ""}, {"cn": "学习", "en": "study", "tag": ""}]}, {"name": "考全部五种形式", "cards": [{"cn": "洗澡（原形）", "en": "bathe", "tag": "原形"}, {"cn": "洗澡（过去式）", "en": "bathed", "tag": "过去式"}, {"cn": "洗澡（过去分词）", "en": "bathed", "tag": "过去分词"}, {"cn": "洗澡（现在分词）", "en": "bathing", "tag": "现在分词"}, {"cn": "洗澡（第三人称单数）", "en": "bathes", "tag": "第三人称单数"}, {"cn": "死（原形）", "en": "die", "tag": "原形"}, {"cn": "死（过去式）", "en": "died", "tag": "过去式"}, {"cn": "死（过去分词）", "en": "died", "tag": "过去分词"}, {"cn": "死（现在分词）", "en": "dying", "tag": "现在分词"}, {"cn": "死（第三人称单数）", "en": "dies", "tag": "第三人称单数"}, {"cn": "哭（原形）", "en": "cry", "tag": "原形"}, {"cn": "哭（过去式）", "en": "cried", "tag": "过去式"}, {"cn": "哭（过去分词）", "en": "cried", "tag": "过去分词"}, {"cn": "哭（现在分词）", "en": "crying", "tag": "现在分词"}, {"cn": "哭（第三人称单数）", "en": "cries", "tag": "第三人称单数"}, {"cn": "工作（原形）", "en": "work", "tag": "原形"}, {"cn": "工作（过去式）", "en": "worked", "tag": "过去式"}, {"cn": "工作（过去分词）", "en": "worked", "tag": "过去分词"}, {"cn": "工作（现在分词）", "en": "working", "tag": "现在分词"}, {"cn": "工作（第三人称单数）", "en": "works", "tag": "第三人称单数"}, {"cn": "睡觉（原形）", "en": "sleep", "tag": "原形"}, {"cn": "睡觉（过去式）", "en": "slept", "tag": "过去式"}, {"cn": "睡觉（过去分词）", "en": "slept", "tag": "过去分词"}, {"cn": "睡觉（现在分词）", "en": "sleeping", "tag": "现在分词"}, {"cn": "睡觉（第三人称单数）", "en": "sleeps", "tag": "第三人称单数"}, {"cn": "坐（原形）", "en": "sit", "tag": "原形"}, {"cn": "坐（过去式）", "en": "sat", "tag": "过去式"}, {"cn": "坐（过去分词）", "en": "sat", "tag": "过去分词"}, {"cn": "坐（现在分词）", "en": "sitting", "tag": "现在分词"}, {"cn": "坐（第三人称单数）", "en": "sits", "tag": "第三人称单数"}, {"cn": "站立（原形）", "en": "stand", "tag": "原形"}, {"cn": "站立（过去式）", "en": "stood", "tag": "过去式"}, {"cn": "站立（过去分词）", "en": "stood", "tag": "过去分词"}, {"cn": "站立（现在分词）", "en": "standing", "tag": "现在分词"}, {"cn": "站立（第三人称单数）", "en": "stands", "tag": "第三人称单数"}, {"cn": "跑（原形）", "en": "run", "tag": "原形"}, {"cn": "跑（过去式）", "en": "ran", "tag": "过去式"}, {"cn": "跑（过去分词）", "en": "run", "tag": "过去分词"}, {"cn": "跑（现在分词）", "en": "running", "tag": "现在分词"}, {"cn": "跑（第三人称单数）", "en": "runs", "tag": "第三人称单数"}, {"cn": "休息（原形）", "en": "rest", "tag": "原形"}, {"cn": "休息（过去式）", "en": "rested", "tag": "过去式"}, {"cn": "休息（过去分词）", "en": "rested", "tag": "过去分词"}, {"cn": "休息（现在分词）", "en": "resting", "tag": "现在分词"}, {"cn": "休息（第三人称单数）", "en": "rests", "tag": "第三人称单数"}, {"cn": "居住（原形）", "en": "live", "tag": "原形"}, {"cn": "居住（过去式）", "en": "lived", "tag": "过去式"}, {"cn": "居住（过去分词）", "en": "lived", "tag": "过去分词"}, {"cn": "居住（现在分词）", "en": "living", "tag": "现在分词"}, {"cn": "居住（第三人称单数）", "en": "lives", "tag": "第三人称单数"}, {"cn": "大笑（原形）", "en": "laugh", "tag": "原形"}, {"cn": "大笑（过去式）", "en": "laughed", "tag": "过去式"}, {"cn": "大笑（过去分词）", "en": "laughed", "tag": "过去分词"}, {"cn": "大笑（现在分词）", "en": "laughing", "tag": "现在分词"}, {"cn": "大笑（第三人称单数）", "en": "laughs", "tag": "第三人称单数"}, {"cn": "微笑（原形）", "en": "smile", "tag": "原形"}, {"cn": "微笑（过去式）", "en": "smiled", "tag": "过去式"}, {"cn": "微笑（过去分词）", "en": "smiled", "tag": "过去分词"}, {"cn": "微笑（现在分词）", "en": "smiling", "tag": "现在分词"}, {"cn": "微笑（第三人称单数）", "en": "smiles", "tag": "第三人称单数"}, {"cn": "跳跃（原形）", "en": "jump", "tag": "原形"}, {"cn": "跳跃（过去式）", "en": "jumped", "tag": "过去式"}, {"cn": "跳跃（过去分词）", "en": "jumped", "tag": "过去分词"}, {"cn": "跳跃（现在分词）", "en": "jumping", "tag": "现在分词"}, {"cn": "跳跃（第三人称单数）", "en": "jumps", "tag": "第三人称单数"}, {"cn": "走（原形）", "en": "go", "tag": "原形"}, {"cn": "走（过去式）", "en": "went", "tag": "过去式"}, {"cn": "走（过去分词）", "en": "gone", "tag": "过去分词"}, {"cn": "走（现在分词）", "en": "going", "tag": "现在分词"}, {"cn": "走（第三人称单数）", "en": "goes", "tag": "第三人称单数"}, {"cn": "飞（原形）", "en": "fly", "tag": "原形"}, {"cn": "飞（过去式）", "en": "flew", "tag": "过去式"}, {"cn": "飞（过去分词）", "en": "flown", "tag": "过去分词"}, {"cn": "飞（现在分词）", "en": "flying", "tag": "现在分词"}, {"cn": "飞（第三人称单数）", "en": "flies", "tag": "第三人称单数"}, {"cn": "游泳（原形）", "en": "swim", "tag": "原形"}, {"cn": "游泳（过去式）", "en": "swam", "tag": "过去式"}, {"cn": "游泳（过去分词）", "en": "swum", "tag": "过去分词"}, {"cn": "游泳（现在分词）", "en": "swimming", "tag": "现在分词"}, {"cn": "游泳（第三人称单数）", "en": "swims", "tag": "第三人称单数"}, {"cn": "步行（原形）", "en": "walk", "tag": "原形"}, {"cn": "步行（过去式）", "en": "walked", "tag": "过去式"}, {"cn": "步行（过去分词）", "en": "walked", "tag": "过去分词"}, {"cn": "步行（现在分词）", "en": "walking", "tag": "现在分词"}, {"cn": "步行（第三人称单数）", "en": "walks", "tag": "第三人称单数"}, {"cn": "旅行（原形）", "en": "travel", "tag": "原形"}, {"cn": "旅行（过去式）", "en": "travelled", "tag": "过去式"}, {"cn": "旅行（过去分词）", "en": "travelled", "tag": "过去分词"}, {"cn": "旅行（现在分词）", "en": "travelling", "tag": "现在分词"}, {"cn": "旅行（第三人称单数）", "en": "travels", "tag": "第三人称单数"}, {"cn": "留下（原形）", "en": "stay", "tag": "原形"}, {"cn": "留下（过去式）", "en": "stayed", "tag": "过去式"}, {"cn": "留下（过去分词）", "en": "stayed", "tag": "过去分词"}, {"cn": "留下（现在分词）", "en": "staying", "tag": "现在分词"}, {"cn": "留下（第三人称单数）", "en": "stays", "tag": "第三人称单数"}, {"cn": "掉下（原形）", "en": "fall", "tag": "原形"}, {"cn": "掉下（过去式）", "en": "fell", "tag": "过去式"}, {"cn": "掉下（过去分词）", "en": "fallen", "tag": "过去分词"}, {"cn": "掉下（现在分词）", "en": "falling", "tag": "现在分词"}, {"cn": "掉下（第三人称单数）", "en": "falls", "tag": "第三人称单数"}, {"cn": "跳舞（原形）", "en": "dance", "tag": "原形"}, {"cn": "跳舞（过去式）", "en": "danced", "tag": "过去式"}, {"cn": "跳舞（过去分词）", "en": "danced", "tag": "过去分词"}, {"cn": "跳舞（现在分词）", "en": "dancing", "tag": "现在分词"}, {"cn": "跳舞（第三人称单数）", "en": "dances", "tag": "第三人称单数"}, {"cn": "咳嗽（原形）", "en": "cough", "tag": "原形"}, {"cn": "咳嗽（过去式）", "en": "coughed", "tag": "过去式"}, {"cn": "咳嗽（过去分词）", "en": "coughed", "tag": "过去分词"}, {"cn": "咳嗽（现在分词）", "en": "coughing", "tag": "现在分词"}, {"cn": "咳嗽（第三人称单数）", "en": "coughs", "tag": "第三人称单数"}, {"cn": "来（原形）", "en": "come", "tag": "原形"}, {"cn": "来（过去式）", "en": "came", "tag": "过去式"}, {"cn": "来（过去分词）", "en": "come", "tag": "过去分词"}, {"cn": "来（现在分词）", "en": "coming", "tag": "现在分词"}, {"cn": "来（第三人称单数）", "en": "comes", "tag": "第三人称单数"}, {"cn": "聊天（原形）", "en": "chat", "tag": "原形"}, {"cn": "聊天（过去式）", "en": "chatted", "tag": "过去式"}, {"cn": "聊天（过去分词）", "en": "chatted", "tag": "过去分词"}, {"cn": "聊天（现在分词）", "en": "chatting", "tag": "现在分词"}, {"cn": "聊天（第三人称单数）", "en": "chats", "tag": "第三人称单数"}, {"cn": "看（原形）", "en": "look", "tag": "原形"}, {"cn": "看（过去式）", "en": "looked", "tag": "过去式"}, {"cn": "看（过去分词）", "en": "looked", "tag": "过去分词"}, {"cn": "看（现在分词）", "en": "looking", "tag": "现在分词"}, {"cn": "看（第三人称单数）", "en": "looks", "tag": "第三人称单数"}, {"cn": "听（原形）", "en": "listen", "tag": "原形"}, {"cn": "听（过去式）", "en": "listened", "tag": "过去式"}, {"cn": "听（过去分词）", "en": "listened", "tag": "过去分词"}, {"cn": "听（现在分词）", "en": "listening", "tag": "现在分词"}, {"cn": "听（第三人称单数）", "en": "listens", "tag": "第三人称单数"}, {"cn": "烘烤（原形）", "en": "bake", "tag": "原形"}, {"cn": "烘烤（过去式）", "en": "baked", "tag": "过去式"}, {"cn": "烘烤（过去分词）", "en": "baked", "tag": "过去分词"}, {"cn": "烘烤（现在分词）", "en": "baking", "tag": "现在分词"}, {"cn": "烘烤（第三人称单数）", "en": "bakes", "tag": "第三人称单数"}, {"cn": "打（原形）", "en": "beat", "tag": "原形"}, {"cn": "打（过去式）", "en": "beat", "tag": "过去式"}, {"cn": "打（过去分词）", "en": "beaten", "tag": "过去分词"}, {"cn": "打（现在分词）", "en": "beating", "tag": "现在分词"}, {"cn": "打（第三人称单数）", "en": "beats", "tag": "第三人称单数"}, {"cn": "开始（原形）", "en": "begin", "tag": "原形"}, {"cn": "开始（过去式）", "en": "began", "tag": "过去式"}, {"cn": "开始（过去分词）", "en": "begun", "tag": "过去分词"}, {"cn": "开始（现在分词）", "en": "beginning", "tag": "现在分词"}, {"cn": "开始（第三人称单数）", "en": "begins", "tag": "第三人称单数"}, {"cn": "相信（原形）", "en": "believe", "tag": "原形"}, {"cn": "相信（过去式）", "en": "believed", "tag": "过去式"}, {"cn": "相信（过去分词）", "en": "believed", "tag": "过去分词"}, {"cn": "相信（现在分词）", "en": "believing", "tag": "现在分词"}, {"cn": "相信（第三人称单数）", "en": "believes", "tag": "第三人称单数"}, {"cn": "借入（原形）", "en": "borrow", "tag": "原形"}, {"cn": "借入（过去式）", "en": "borrowed", "tag": "过去式"}, {"cn": "借入（过去分词）", "en": "borrowed", "tag": "过去分词"}, {"cn": "借入（现在分词）", "en": "borrowing", "tag": "现在分词"}, {"cn": "借入（第三人称单数）", "en": "borrows", "tag": "第三人称单数"}, {"cn": "打破（原形）", "en": "break", "tag": "原形"}, {"cn": "打破（过去式）", "en": "broke", "tag": "过去式"}, {"cn": "打破（过去分词）", "en": "broken", "tag": "过去分词"}, {"cn": "打破（现在分词）", "en": "breaking", "tag": "现在分词"}, {"cn": "打破（第三人称单数）", "en": "breaks", "tag": "第三人称单数"}, {"cn": "带来（原形）", "en": "bring", "tag": "原形"}, {"cn": "带来（过去式）", "en": "brought", "tag": "过去式"}, {"cn": "带来（过去分词）", "en": "brought", "tag": "过去分词"}, {"cn": "带来（现在分词）", "en": "bringing", "tag": "现在分词"}, {"cn": "带来（第三人称单数）", "en": "brings", "tag": "第三人称单数"}, {"cn": "刷（原形）", "en": "brush", "tag": "原形"}, {"cn": "刷（过去式）", "en": "brushed", "tag": "过去式"}, {"cn": "刷（过去分词）", "en": "brushed", "tag": "过去分词"}, {"cn": "刷（现在分词）", "en": "brushing", "tag": "现在分词"}, {"cn": "刷（第三人称单数）", "en": "brushes", "tag": "第三人称单数"}, {"cn": "买（原形）", "en": "buy", "tag": "原形"}, {"cn": "买（过去式）", "en": "bought", "tag": "过去式"}, {"cn": "买（过去分词）", "en": "bought", "tag": "过去分词"}, {"cn": "买（现在分词）", "en": "buying", "tag": "现在分词"}, {"cn": "买（第三人称单数）", "en": "buys", "tag": "第三人称单数"}, {"cn": "打电话（原形）", "en": "call", "tag": "原形"}, {"cn": "打电话（过去式）", "en": "called", "tag": "过去式"}, {"cn": "打电话（过去分词）", "en": "called", "tag": "过去分词"}, {"cn": "打电话（现在分词）", "en": "calling", "tag": "现在分词"}, {"cn": "打电话（第三人称单数）", "en": "calls", "tag": "第三人称单数"}, {"cn": "抓住（原形）", "en": "catch", "tag": "原形"}, {"cn": "抓住（过去式）", "en": "caught", "tag": "过去式"}, {"cn": "抓住（过去分词）", "en": "caught", "tag": "过去分词"}, {"cn": "抓住（现在分词）", "en": "catching", "tag": "现在分词"}, {"cn": "抓住（第三人称单数）", "en": "catches", "tag": "第三人称单数"}, {"cn": "爬（原形）", "en": "climb", "tag": "原形"}, {"cn": "爬（过去式）", "en": "climbed", "tag": "过去式"}, {"cn": "爬（过去分词）", "en": "climbed", "tag": "过去分词"}, {"cn": "爬（现在分词）", "en": "climbing", "tag": "现在分词"}, {"cn": "爬（第三人称单数）", "en": "climbs", "tag": "第三人称单数"}, {"cn": "梳理（原形）", "en": "comb", "tag": "原形"}, {"cn": "梳理（过去式）", "en": "combed", "tag": "过去式"}, {"cn": "梳理（过去分词）", "en": "combed", "tag": "过去分词"}, {"cn": "梳理（现在分词）", "en": "combing", "tag": "现在分词"}, {"cn": "梳理（第三人称单数）", "en": "combs", "tag": "第三人称单数"}, {"cn": "煮（原形）", "en": "cook", "tag": "原形"}, {"cn": "煮（过去式）", "en": "cooked", "tag": "过去式"}, {"cn": "煮（过去分词）", "en": "cooked", "tag": "过去分词"}, {"cn": "煮（现在分词）", "en": "cooking", "tag": "现在分词"}, {"cn": "煮（第三人称单数）", "en": "cooks", "tag": "第三人称单数"}, {"cn": "抄写（原形）", "en": "copy", "tag": "原形"}, {"cn": "抄写（过去式）", "en": "copied", "tag": "过去式"}, {"cn": "抄写（过去分词）", "en": "copied", "tag": "过去分词"}, {"cn": "抄写（现在分词）", "en": "copying", "tag": "现在分词"}, {"cn": "抄写（第三人称单数）", "en": "copies", "tag": "第三人称单数"}, {"cn": "改正（原形）", "en": "correct", "tag": "原形"}, {"cn": "改正（过去式）", "en": "corrected", "tag": "过去式"}, {"cn": "改正（过去分词）", "en": "corrected", "tag": "过去分词"}, {"cn": "改正（现在分词）", "en": "correcting", "tag": "现在分词"}, {"cn": "改正（第三人称单数）", "en": "corrects", "tag": "第三人称单数"}, {"cn": "割，切（原形）", "en": "cut", "tag": "原形"}, {"cn": "割，切（过去式）", "en": "cut", "tag": "过去式"}, {"cn": "割，切（过去分词）", "en": "cut", "tag": "过去分词"}, {"cn": "割，切（现在分词）", "en": "cutting", "tag": "现在分词"}, {"cn": "割，切（第三人称单数）", "en": "cuts", "tag": "第三人称单数"}, {"cn": "讨论（原形）", "en": "discuss", "tag": "原形"}, {"cn": "讨论（过去式）", "en": "discussed", "tag": "过去式"}, {"cn": "讨论（过去分词）", "en": "discussed", "tag": "过去分词"}, {"cn": "讨论（现在分词）", "en": "discussing", "tag": "现在分词"}, {"cn": "讨论（第三人称单数）", "en": "discusses", "tag": "第三人称单数"}, {"cn": "做（原形）", "en": "do", "tag": "原形"}, {"cn": "做（过去式）", "en": "did", "tag": "过去式"}, {"cn": "做（过去分词）", "en": "done", "tag": "过去分词"}, {"cn": "做（现在分词）", "en": "doing", "tag": "现在分词"}, {"cn": "做（第三人称单数）", "en": "does", "tag": "第三人称单数"}, {"cn": "画（原形）", "en": "draw", "tag": "原形"}, {"cn": "画（过去式）", "en": "drew", "tag": "过去式"}, {"cn": "画（过去分词）", "en": "drawn", "tag": "过去分词"}, {"cn": "画（现在分词）", "en": "drawing", "tag": "现在分词"}, {"cn": "画（第三人称单数）", "en": "draws", "tag": "第三人称单数"}, {"cn": "喝（原形）", "en": "drink", "tag": "原形"}, {"cn": "喝（过去式）", "en": "drank", "tag": "过去式"}, {"cn": "喝（过去分词）", "en": "drunk", "tag": "过去分词"}, {"cn": "喝（现在分词）", "en": "drinking", "tag": "现在分词"}, {"cn": "喝（第三人称单数）", "en": "drinks", "tag": "第三人称单数"}, {"cn": "驾驶（原形）", "en": "drive", "tag": "原形"}, {"cn": "驾驶（过去式）", "en": "drove", "tag": "过去式"}, {"cn": "驾驶（过去分词）", "en": "driven", "tag": "过去分词"}, {"cn": "驾驶（现在分词）", "en": "driving", "tag": "现在分词"}, {"cn": "驾驶（第三人称单数）", "en": "drives", "tag": "第三人称单数"}, {"cn": "挣,赚（原形）", "en": "earn", "tag": "原形"}, {"cn": "挣,赚（过去式）", "en": "earned", "tag": "过去式"}, {"cn": "挣,赚（过去分词）", "en": "earned", "tag": "过去分词"}, {"cn": "挣,赚（现在分词）", "en": "earning", "tag": "现在分词"}, {"cn": "挣,赚（第三人称单数）", "en": "earns", "tag": "第三人称单数"}, {"cn": "吃（原形）", "en": "eat", "tag": "原形"}, {"cn": "吃（过去式）", "en": "ate", "tag": "过去式"}, {"cn": "吃（过去分词）", "en": "eaten", "tag": "过去分词"}, {"cn": "吃（现在分词）", "en": "eating", "tag": "现在分词"}, {"cn": "吃（第三人称单数）", "en": "eats", "tag": "第三人称单数"}, {"cn": "发现（原形）", "en": "find", "tag": "原形"}, {"cn": "发现（过去式）", "en": "found", "tag": "过去式"}, {"cn": "发现（过去分词）", "en": "found", "tag": "过去分词"}, {"cn": "发现（现在分词）", "en": "finding", "tag": "现在分词"}, {"cn": "发现（第三人称单数）", "en": "finds", "tag": "第三人称单数"}, {"cn": "完成（原形）", "en": "finish", "tag": "原形"}, {"cn": "完成（过去式）", "en": "finished", "tag": "过去式"}, {"cn": "完成（过去分词）", "en": "finished", "tag": "过去分词"}, {"cn": "完成（现在分词）", "en": "finishing", "tag": "现在分词"}, {"cn": "完成（第三人称单数）", "en": "finishes", "tag": "第三人称单数"}, {"cn": "跟随（原形）", "en": "follow", "tag": "原形"}, {"cn": "跟随（过去式）", "en": "followed", "tag": "过去式"}, {"cn": "跟随（过去分词）", "en": "followed", "tag": "过去分词"}, {"cn": "跟随（现在分词）", "en": "following", "tag": "现在分词"}, {"cn": "跟随（第三人称单数）", "en": "follows", "tag": "第三人称单数"}, {"cn": "忘记（原形）", "en": "forget", "tag": "原形"}, {"cn": "忘记（过去式）", "en": "forgot", "tag": "过去式"}, {"cn": "忘记（过去分词）", "en": "forgotten", "tag": "过去分词"}, {"cn": "忘记（现在分词）", "en": "forgetting", "tag": "现在分词"}, {"cn": "忘记（第三人称单数）", "en": "forgets", "tag": "第三人称单数"}, {"cn": "得到（原形）", "en": "get", "tag": "原形"}, {"cn": "得到（过去式）", "en": "got", "tag": "过去式"}, {"cn": "得到（过去分词）", "en": "got/gotten", "tag": "过去分词"}, {"cn": "得到（现在分词）", "en": "getting", "tag": "现在分词"}, {"cn": "得到（第三人称单数）", "en": "gets", "tag": "第三人称单数"}, {"cn": "给（原形）", "en": "give", "tag": "原形"}, {"cn": "给（过去式）", "en": "gave", "tag": "过去式"}, {"cn": "给（过去分词）", "en": "given", "tag": "过去分词"}, {"cn": "给（现在分词）", "en": "giving", "tag": "现在分词"}, {"cn": "给（第三人称单数）", "en": "gives", "tag": "第三人称单数"}, {"cn": "猜测（原形）", "en": "guess", "tag": "原形"}, {"cn": "猜测（过去式）", "en": "guessed", "tag": "过去式"}, {"cn": "猜测（过去分词）", "en": "guessed", "tag": "过去分词"}, {"cn": "猜测（现在分词）", "en": "guessing", "tag": "现在分词"}, {"cn": "猜测（第三人称单数）", "en": "guesses", "tag": "第三人称单数"}, {"cn": "恨（原形）", "en": "hate", "tag": "原形"}, {"cn": "恨（过去式）", "en": "hated", "tag": "过去式"}, {"cn": "恨（过去分词）", "en": "hated", "tag": "过去分词"}, {"cn": "恨（现在分词）", "en": "hating", "tag": "现在分词"}, {"cn": "恨（第三人称单数）", "en": "hates", "tag": "第三人称单数"}, {"cn": "听到（原形）", "en": "hear", "tag": "原形"}, {"cn": "听到（过去式）", "en": "heard", "tag": "过去式"}, {"cn": "听到（过去分词）", "en": "heard", "tag": "过去分词"}, {"cn": "听到（现在分词）", "en": "hearing", "tag": "现在分词"}, {"cn": "听到（第三人称单数）", "en": "hears", "tag": "第三人称单数"}, {"cn": "帮助（原形）", "en": "help", "tag": "原形"}, {"cn": "帮助（过去式）", "en": "helped", "tag": "过去式"}, {"cn": "帮助（过去分词）", "en": "helped", "tag": "过去分词"}, {"cn": "帮助（现在分词）", "en": "helping", "tag": "现在分词"}, {"cn": "帮助（第三人称单数）", "en": "helps", "tag": "第三人称单数"}, {"cn": "打（原形）", "en": "hit", "tag": "原形"}, {"cn": "打（过去式）", "en": "hit", "tag": "过去式"}, {"cn": "打（过去分词）", "en": "hit", "tag": "过去分词"}, {"cn": "打（现在分词）", "en": "hitting", "tag": "现在分词"}, {"cn": "打（第三人称单数）", "en": "hits", "tag": "第三人称单数"}, {"cn": "握住（原形）", "en": "hold", "tag": "原形"}, {"cn": "握住（过去式）", "en": "held", "tag": "过去式"}, {"cn": "握住（过去分词）", "en": "held", "tag": "过去分词"}, {"cn": "握住（现在分词）", "en": "holding", "tag": "现在分词"}, {"cn": "握住（第三人称单数）", "en": "holds", "tag": "第三人称单数"}, {"cn": "伤害（原形）", "en": "hurt", "tag": "原形"}, {"cn": "伤害（过去式）", "en": "hurt", "tag": "过去式"}, {"cn": "伤害（过去分词）", "en": "hurt", "tag": "过去分词"}, {"cn": "伤害（现在分词）", "en": "hurting", "tag": "现在分词"}, {"cn": "伤害（第三人称单数）", "en": "hurts", "tag": "第三人称单数"}, {"cn": "介绍（原形）", "en": "introduce", "tag": "原形"}, {"cn": "介绍（过去式）", "en": "introduced", "tag": "过去式"}, {"cn": "介绍（过去分词）", "en": "introduced", "tag": "过去分词"}, {"cn": "介绍（现在分词）", "en": "introducing", "tag": "现在分词"}, {"cn": "介绍（第三人称单数）", "en": "introduces", "tag": "第三人称单数"}, {"cn": "邀请（原形）", "en": "invite", "tag": "原形"}, {"cn": "邀请（过去式）", "en": "invited", "tag": "过去式"}, {"cn": "邀请（过去分词）", "en": "invited", "tag": "过去分词"}, {"cn": "邀请（现在分词）", "en": "inviting", "tag": "现在分词"}, {"cn": "邀请（第三人称单数）", "en": "invites", "tag": "第三人称单数"}, {"cn": "加入（原形）", "en": "join", "tag": "原形"}, {"cn": "加入（过去式）", "en": "joined", "tag": "过去式"}, {"cn": "加入（过去分词）", "en": "joined", "tag": "过去分词"}, {"cn": "加入（现在分词）", "en": "joining", "tag": "现在分词"}, {"cn": "加入（第三人称单数）", "en": "joins", "tag": "第三人称单数"}, {"cn": "保持（原形）", "en": "keep", "tag": "原形"}, {"cn": "保持（过去式）", "en": "kept", "tag": "过去式"}, {"cn": "保持（过去分词）", "en": "kept", "tag": "过去分词"}, {"cn": "保持（现在分词）", "en": "keeping", "tag": "现在分词"}, {"cn": "保持（第三人称单数）", "en": "keeps", "tag": "第三人称单数"}, {"cn": "杀死（原形）", "en": "kill", "tag": "原形"}, {"cn": "杀死（过去式）", "en": "killed", "tag": "过去式"}, {"cn": "杀死（过去分词）", "en": "killed", "tag": "过去分词"}, {"cn": "杀死（现在分词）", "en": "killing", "tag": "现在分词"}, {"cn": "杀死（第三人称单数）", "en": "kills", "tag": "第三人称单数"}, {"cn": "敲（原形）", "en": "knock", "tag": "原形"}, {"cn": "敲（过去式）", "en": "knocked", "tag": "过去式"}, {"cn": "敲（过去分词）", "en": "knocked", "tag": "过去分词"}, {"cn": "敲（现在分词）", "en": "knocking", "tag": "现在分词"}, {"cn": "敲（第三人称单数）", "en": "knocks", "tag": "第三人称单数"}, {"cn": "知道（原形）", "en": "know", "tag": "原形"}, {"cn": "知道（过去式）", "en": "knew", "tag": "过去式"}, {"cn": "知道（过去分词）", "en": "known", "tag": "过去分词"}, {"cn": "知道（现在分词）", "en": "knowing", "tag": "现在分词"}, {"cn": "知道（第三人称单数）", "en": "knows", "tag": "第三人称单数"}, {"cn": "学习（原形）", "en": "learn", "tag": "原形"}, {"cn": "学习（过去式）", "en": "learnt/learned", "tag": "过去式"}, {"cn": "学习（过去分词）", "en": "learnt/learned", "tag": "过去分词"}, {"cn": "学习（现在分词）", "en": "learning", "tag": "现在分词"}, {"cn": "学习（第三人称单数）", "en": "learns", "tag": "第三人称单数"}, {"cn": "离开（原形）", "en": "leave", "tag": "原形"}, {"cn": "离开（过去式）", "en": "left", "tag": "过去式"}, {"cn": "离开（过去分词）", "en": "left", "tag": "过去分词"}, {"cn": "离开（现在分词）", "en": "leaving", "tag": "现在分词"}, {"cn": "离开（第三人称单数）", "en": "leaves", "tag": "第三人称单数"}, {"cn": "借出（原形）", "en": "lend", "tag": "原形"}, {"cn": "借出（过去式）", "en": "lent", "tag": "过去式"}, {"cn": "借出（过去分词）", "en": "lent", "tag": "过去分词"}, {"cn": "借出（现在分词）", "en": "lending", "tag": "现在分词"}, {"cn": "借出（第三人称单数）", "en": "lends", "tag": "第三人称单数"}, {"cn": "喜欢（原形）", "en": "like", "tag": "原形"}, {"cn": "喜欢（过去式）", "en": "liked", "tag": "过去式"}, {"cn": "喜欢（过去分词）", "en": "liked", "tag": "过去分词"}, {"cn": "喜欢（现在分词）", "en": "liking", "tag": "现在分词"}, {"cn": "喜欢（第三人称单数）", "en": "likes", "tag": "第三人称单数"}, {"cn": "锁（原形）", "en": "lock", "tag": "原形"}, {"cn": "锁（过去式）", "en": "locked", "tag": "过去式"}, {"cn": "锁（过去分词）", "en": "locked", "tag": "过去分词"}, {"cn": "锁（现在分词）", "en": "locking", "tag": "现在分词"}, {"cn": "锁（第三人称单数）", "en": "locks", "tag": "第三人称单数"}, {"cn": "丢失（原形）", "en": "lose", "tag": "原形"}, {"cn": "丢失（过去式）", "en": "lost", "tag": "过去式"}, {"cn": "丢失（过去分词）", "en": "lost", "tag": "过去分词"}, {"cn": "丢失（现在分词）", "en": "losing", "tag": "现在分词"}, {"cn": "丢失（第三人称单数）", "en": "loses", "tag": "第三人称单数"}, {"cn": "爱（原形）", "en": "love", "tag": "原形"}, {"cn": "爱（过去式）", "en": "loved", "tag": "过去式"}, {"cn": "爱（过去分词）", "en": "loved", "tag": "过去分词"}, {"cn": "爱（现在分词）", "en": "loving", "tag": "现在分词"}, {"cn": "爱（第三人称单数）", "en": "loves", "tag": "第三人称单数"}, {"cn": "制造（原形）", "en": "make", "tag": "原形"}, {"cn": "制造（过去式）", "en": "made", "tag": "过去式"}, {"cn": "制造（过去分词）", "en": "made", "tag": "过去分词"}, {"cn": "制造（现在分词）", "en": "making", "tag": "现在分词"}, {"cn": "制造（第三人称单数）", "en": "makes", "tag": "第三人称单数"}, {"cn": "需要（原形）", "en": "need", "tag": "原形"}, {"cn": "需要（过去式）", "en": "needed", "tag": "过去式"}, {"cn": "需要（过去分词）", "en": "needed", "tag": "过去分词"}, {"cn": "需要（现在分词）", "en": "needing", "tag": "现在分词"}, {"cn": "需要（第三人称单数）", "en": "needs", "tag": "第三人称单数"}, {"cn": "遇见（原形）", "en": "meet", "tag": "原形"}, {"cn": "遇见（过去式）", "en": "met", "tag": "过去式"}, {"cn": "遇见（过去分词）", "en": "met", "tag": "过去分词"}, {"cn": "遇见（现在分词）", "en": "meeting", "tag": "现在分词"}, {"cn": "遇见（第三人称单数）", "en": "meets", "tag": "第三人称单数"}, {"cn": "思念（原形）", "en": "miss", "tag": "原形"}, {"cn": "思念（过去式）", "en": "missed", "tag": "过去式"}, {"cn": "思念（过去分词）", "en": "missed", "tag": "过去分词"}, {"cn": "思念（现在分词）", "en": "missing", "tag": "现在分词"}, {"cn": "思念（第三人称单数）", "en": "misses", "tag": "第三人称单数"}, {"cn": "移动（原形）", "en": "move", "tag": "原形"}, {"cn": "移动（过去式）", "en": "moved", "tag": "过去式"}, {"cn": "移动（过去分词）", "en": "moved", "tag": "过去分词"}, {"cn": "移动（现在分词）", "en": "moving", "tag": "现在分词"}, {"cn": "移动（第三人称单数）", "en": "moves", "tag": "第三人称单数"}, {"cn": "娶，嫁（原形）", "en": "marry", "tag": "原形"}, {"cn": "娶，嫁（过去式）", "en": "married", "tag": "过去式"}, {"cn": "娶，嫁（过去分词）", "en": "married", "tag": "过去分词"}, {"cn": "娶，嫁（现在分词）", "en": "marrying", "tag": "现在分词"}, {"cn": "娶，嫁（第三人称单数）", "en": "marries", "tag": "第三人称单数"}, {"cn": "打开（原形）", "en": "open", "tag": "原形"}, {"cn": "打开（过去式）", "en": "opened", "tag": "过去式"}, {"cn": "打开（过去分词）", "en": "opened", "tag": "过去分词"}, {"cn": "打开（现在分词）", "en": "opening", "tag": "现在分词"}, {"cn": "打开（第三人称单数）", "en": "opens", "tag": "第三人称单数"}, {"cn": "拥有（原形）", "en": "own", "tag": "原形"}, {"cn": "拥有（过去式）", "en": "owned", "tag": "过去式"}, {"cn": "拥有（过去分词）", "en": "owned", "tag": "过去分词"}, {"cn": "拥有（现在分词）", "en": "owning", "tag": "现在分词"}, {"cn": "拥有（第三人称单数）", "en": "owns", "tag": "第三人称单数"}, {"cn": "支付（原形）", "en": "pay", "tag": "原形"}, {"cn": "支付（过去式）", "en": "paid", "tag": "过去式"}, {"cn": "支付（过去分词）", "en": "paid", "tag": "过去分词"}, {"cn": "支付（现在分词）", "en": "paying", "tag": "现在分词"}, {"cn": "支付（第三人称单数）", "en": "pays", "tag": "第三人称单数"}, {"cn": "通过（原形）", "en": "pass", "tag": "原形"}, {"cn": "通过（过去式）", "en": "passed", "tag": "过去式"}, {"cn": "通过（过去分词）", "en": "passed", "tag": "过去分词"}, {"cn": "通过（现在分词）", "en": "passing", "tag": "现在分词"}, {"cn": "通过（第三人称单数）", "en": "passes", "tag": "第三人称单数"}, {"cn": "捡（原形）", "en": "pick", "tag": "原形"}, {"cn": "捡（过去式）", "en": "picked", "tag": "过去式"}, {"cn": "捡（过去分词）", "en": "picked", "tag": "过去分词"}, {"cn": "捡（现在分词）", "en": "picking", "tag": "现在分词"}, {"cn": "捡（第三人称单数）", "en": "picks", "tag": "第三人称单数"}, {"cn": "拒绝（原形）", "en": "refuse", "tag": "原形"}, {"cn": "拒绝（过去式）", "en": "refused", "tag": "过去式"}, {"cn": "拒绝（过去分词）", "en": "refused", "tag": "过去分词"}, {"cn": "拒绝（现在分词）", "en": "refusing", "tag": "现在分词"}, {"cn": "拒绝（第三人称单数）", "en": "refuses", "tag": "第三人称单数"}, {"cn": "惩罚（原形）", "en": "punish", "tag": "原形"}, {"cn": "惩罚（过去式）", "en": "punished", "tag": "过去式"}, {"cn": "惩罚（过去分词）", "en": "punished", "tag": "过去分词"}, {"cn": "惩罚（现在分词）", "en": "punishing", "tag": "现在分词"}, {"cn": "惩罚（第三人称单数）", "en": "punishes", "tag": "第三人称单数"}, {"cn": "放（原形）", "en": "put", "tag": "原形"}, {"cn": "放（过去式）", "en": "put", "tag": "过去式"}, {"cn": "放（过去分词）", "en": "put", "tag": "过去分词"}, {"cn": "放（现在分词）", "en": "putting", "tag": "现在分词"}, {"cn": "放（第三人称单数）", "en": "puts", "tag": "第三人称单数"}, {"cn": "推（原形）", "en": "push", "tag": "原形"}, {"cn": "推（过去式）", "en": "pushed", "tag": "过去式"}, {"cn": "推（过去分词）", "en": "pushed", "tag": "过去分词"}, {"cn": "推（现在分词）", "en": "pushing", "tag": "现在分词"}, {"cn": "推（第三人称单数）", "en": "pushes", "tag": "第三人称单数"}, {"cn": "说（原形）", "en": "speak", "tag": "原形"}, {"cn": "说（过去式）", "en": "spoke", "tag": "过去式"}, {"cn": "说（过去分词）", "en": "spoken", "tag": "过去分词"}, {"cn": "说（现在分词）", "en": "speaking", "tag": "现在分词"}, {"cn": "说（第三人称单数）", "en": "speaks", "tag": "第三人称单数"}, {"cn": "支持（原形）", "en": "support", "tag": "原形"}, {"cn": "支持（过去式）", "en": "supported", "tag": "过去式"}, {"cn": "支持（过去分词）", "en": "supported", "tag": "过去分词"}, {"cn": "支持（现在分词）", "en": "supporting", "tag": "现在分词"}, {"cn": "支持（第三人称单数）", "en": "supports", "tag": "第三人称单数"}, {"cn": "开始（原形）", "en": "start", "tag": "原形"}, {"cn": "开始（过去式）", "en": "started", "tag": "过去式"}, {"cn": "开始（过去分词）", "en": "started", "tag": "过去分词"}, {"cn": "开始（现在分词）", "en": "starting", "tag": "现在分词"}, {"cn": "开始（第三人称单数）", "en": "starts", "tag": "第三人称单数"}, {"cn": "学习（原形）", "en": "study", "tag": "原形"}, {"cn": "学习（过去式）", "en": "studied", "tag": "过去式"}, {"cn": "学习（过去分词）", "en": "studied", "tag": "过去分词"}, {"cn": "学习（现在分词）", "en": "studying", "tag": "现在分词"}, {"cn": "学习（第三人称单数）", "en": "studies", "tag": "第三人称单数"}]}];
+
+function normalize(s) {
+  return s.toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[.,!?;:"“”]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isCorrect(userInput, answerField) {
+  const user = normalize(userInput);
+  if (!user) return false;
+  const alts = answerField.split('/').map(a => normalize(a));
+  return alts.includes(user);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const setupEl = document.getElementById('setup');
+const quizEl = document.getElementById('quiz');
+const doneEl = document.getElementById('done');
+const deckListEl = document.getElementById('deckList');
+const shuffleOpt = document.getElementById('shuffleOpt');
+
+let state = null;
+
+function renderDeckList() {
+  deckListEl.innerHTML = '';
+  DECKS.forEach((deck, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'deck-btn';
+    btn.innerHTML = `<span>${deck.name}</span><span class="count">${deck.cards.length} 题</span>`;
+    btn.onclick = () => startDeck(idx);
+    deckListEl.appendChild(btn);
+  });
+}
+
+function startDeck(idx, cardsOverride, label) {
+  const deck = DECKS[idx];
+  let cards = cardsOverride
+    ? cardsOverride.map((c) => ({...c}))
+    : deck.cards.map((c, i) => ({...c, id: i}));
+  if (shuffleOpt.checked) cards = shuffle(cards);
+  const isReview = !!cardsOverride;
+  state = {
+    deckIdx: idx,
+    queue: cards,
+    total: cards.length,
+    correct: 0,
+    wrong: 0,
+    current: null,
+    attemptedWrongOnCurrent: false,
+    wrongMap: (isReview && state) ? state.wrongMap : {},
+    isReview: isReview,
+  };
+  setupEl.hidden = true;
+  doneEl.hidden = true;
+  quizEl.hidden = false;
+  document.getElementById('deckTag').textContent = label || deck.name;
+  showAnswerRow();
+  nextCard();
+}
+
+function showAnswerRow() {
+  document.getElementById('answerRow').hidden = false;
+  document.getElementById('nextRow').hidden = true;
+}
+function showNextRow() {
+  document.getElementById('answerRow').hidden = true;
+  document.getElementById('nextRow').hidden = false;
+  document.getElementById('nextBtn').focus();
+}
+
+function nextCard() {
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback';
+  feedback.textContent = '';
+  const input = document.getElementById('answerInput');
+  input.value = '';
+  input.disabled = false;
+  document.getElementById('submitBtn').disabled = false;
+  showAnswerRow();
+
+  if (state.queue.length === 0) {
+    finishDeck();
+    return;
+  }
+  state.current = state.queue[0];
+  state.attemptedWrongOnCurrent = false;
+  document.getElementById('promptCn').textContent = state.current.cn;
+  updateStats();
+  input.focus();
+}
+
+function advanceCard() {
+  state.queue.shift();
+  nextCard();
+}
+
+function updateStats() {
+  document.getElementById('correctCount').textContent = state.correct;
+  document.getElementById('wrongCount').textContent = state.wrong;
+  document.getElementById('remainCount').textContent = state.queue.length;
+  const done = state.total - state.queue.length;
+  document.getElementById('progressText').textContent = `${done} / ${state.total}`;
+  document.getElementById('progressFill').style.width = `${(done / state.total) * 100}%`;
+}
+
+function markWrong(card) {
+  if (!state.attemptedWrongOnCurrent) {
+    state.wrong++;
+    state.attemptedWrongOnCurrent = true;
+    updateStats();
+  }
+  state.wrongMap[card.id] = card;
+}
+
+function markSolved(card) {
+  // answered correctly on first try during an error-review round: it's learned, drop it
+  if (state.isReview) delete state.wrongMap[card.id];
+}
+
+function submitAnswer() {
+  const input = document.getElementById('answerInput');
+  const feedback = document.getElementById('feedback');
+  const val = input.value;
+  if (!val.trim()) return;
+  const card = state.current;
+  if (isCorrect(val, card.en)) {
+    feedback.className = 'feedback good show';
+    feedback.innerHTML = `✓ 正确！ <span class="answer">${card.en}</span>`;
+    if (!state.attemptedWrongOnCurrent) {
+      state.correct++;
+      markSolved(card);
+    }
+    input.disabled = true;
+    updateStats();
+    showNextRow();
+  } else {
+    feedback.className = 'feedback bad show';
+    feedback.innerHTML = `✗ 不对，再试一次`;
+    markWrong(card);
+    input.select();
+  }
+}
+
+function skipCard() {
+  const card = state.current;
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback bad show';
+  feedback.innerHTML = `正确答案： <span class="answer">${card.en}</span> —— 记住它，下次再考`;
+  markWrong(card);
+  document.getElementById('answerInput').disabled = true;
+  showNextRow();
+}
+
+function finishDeck() {
+  quizEl.hidden = true;
+  doneEl.hidden = false;
+  const wrongCards = Object.values(state.wrongMap);
+  const reviewBtn = document.getElementById('reviewBtn');
+  const wrongBook = document.getElementById('wrongBook');
+  const wrongList = document.getElementById('wrongList');
+
+  if (wrongCards.length > 0) {
+    document.getElementById('doneEmoji').textContent = '📝';
+    document.getElementById('doneTitle').textContent = '本轮完成';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次，还有 ${wrongCards.length} 个错题待巩固`;
+    reviewBtn.hidden = false;
+    reviewBtn.textContent = `针对错题再考一次（${wrongCards.length} 题）`;
+    wrongBook.hidden = false;
+    wrongList.innerHTML = wrongCards.map(c =>
+      `<div class="wrong-item"><span class="cn">${c.cn}</span><span class="en">${c.en}</span></div>`
+    ).join('');
+  } else {
+    document.getElementById('doneEmoji').textContent = '🎉';
+    document.getElementById('doneTitle').textContent = state.isReview ? '错题全部攻克！' : '全部完成！';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次`;
+    reviewBtn.hidden = true;
+    wrongBook.hidden = true;
+  }
+}
+
+document.getElementById('submitBtn').onclick = submitAnswer;
+document.getElementById('skipBtn').onclick = skipCard;
+document.getElementById('nextBtn').onclick = advanceCard;
+document.getElementById('answerInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitAnswer();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !document.getElementById('nextRow').hidden) advanceCard();
+});
+document.getElementById('backBtn').onclick = () => {
+  quizEl.hidden = true;
+  setupEl.hidden = false;
+};
+document.getElementById('restartBtn').onclick = () => startDeck(state.deckIdx);
+document.getElementById('reviewBtn').onclick = () => {
+  const wrongCards = Object.values(state.wrongMap);
+  startDeck(state.deckIdx, wrongCards, `${DECKS[state.deckIdx].name} · 错题重考`);
+};
+document.getElementById('chooseAnotherBtn').onclick = () => {
+  doneEl.hidden = true;
+  setupEl.hidden = false;
+};
+
+renderDeckList();
+</script>
+</body>
+</html>
