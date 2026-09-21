@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语量词 · 英文考查</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card-bg: #ffffff;
+    --text: #1c1e21;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --accent-2: #4f46e5;
+    --good: #16a34a;
+    --good-bg: #ecfdf3;
+    --bad: #dc2626;
+    --bad-bg: #fef2f2;
+    --pill-bg: #eef2ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111318;
+      --card-bg: #1b1e24;
+      --text: #e8eaed;
+      --muted: #9aa1ac;
+      --border: #2b2f38;
+      --accent: #60a5fa;
+      --accent-2: #818cf8;
+      --good: #4ade80;
+      --good-bg: #0f2a1a;
+      --bad: #f87171;
+      --bad-bg: #2a1414;
+      --pill-bg: #1e2436;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+  .setup-card, .quiz-card, .done-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .deck-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0 20px; }
+  .deck-btn {
+    text-align: left;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--pill-bg);
+    color: var(--text);
+    font-size: 0.98rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .deck-btn:hover { border-color: var(--accent); }
+  .deck-btn .count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+  .opt-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 0.9rem; color: var(--muted); }
+  .opt-row input { accent-color: var(--accent); }
+
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.85rem; color: var(--muted); }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 4px; margin: 0 12px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .25s ease; }
+
+  .prompt-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+  .prompt-cn { font-size: 1.6rem; font-weight: 600; line-height: 1.4; margin-bottom: 22px; white-space: pre-line; }
+
+  input[type=text] {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  button.primary, button.secondary {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.primary { background: var(--accent); color: white; }
+  button.primary:active { background: var(--accent-2); }
+  button.secondary { background: var(--pill-bg); color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; display: none; }
+  .feedback.show { display: block; }
+  .feedback.good { background: var(--good-bg); color: var(--good); }
+  .feedback.bad { background: var(--bad-bg); color: var(--bad); }
+  .feedback .answer { color: var(--text); font-weight: 600; }
+
+  .stat-row { display: flex; gap: 16px; font-size: 0.85rem; color: var(--muted); margin-top: 16px; }
+  .stat-row b { color: var(--text); }
+
+  .done-card { text-align: center; }
+  .done-card .big { font-size: 2.2rem; margin-bottom: 6px; }
+  .link-back { display: block; text-align: center; margin-top: 18px; color: var(--muted); font-size: 0.85rem; cursor: pointer; }
+  [hidden] { display: none !important; }
+
+  .wrong-book { text-align: left; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .wrong-book-title { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+  .wrong-list { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .wrong-item { display: flex; justify-content: space-between; gap: 12px; background: var(--bad-bg); border-radius: 8px; padding: 8px 12px; font-size: 0.9rem; }
+  .wrong-item .cn { color: var(--text); }
+  .wrong-item .en { color: var(--bad); font-weight: 600; white-space: nowrap; }
+  button.review {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bad);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>英语量词 · 英文考查</h1>
+  <div class="subtitle">共 74 个常用量词短语（生活用品/动物人物/食品/液体/自然/抽象事物）</div>
+
+  <div id="setup" class="setup-card">
+    <div style="font-weight:600; margin-bottom: 4px;">选择练习内容</div>
+    <div style="font-size:0.85rem; color: var(--muted);">看中文提示，写出对应的英文；答对或查看答案后，需手动点击"下一题"。做错的词会被记入错题本，可在完成后针对错题单独再考。</div>
+    <div class="deck-list" id="deckList"></div>
+    <label class="opt-row"><input type="checkbox" id="shuffleOpt" checked> 打乱顺序</label>
+  </div>
+
+  <div id="quiz" class="quiz-card" hidden>
+    <div class="top-bar">
+      <span id="progressText">1 / 1</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span id="deckTag"></span>
+    </div>
+    <div class="prompt-label" id="promptLabel">请写出对应的英文</div>
+    <div class="prompt-cn" id="promptCn"></div>
+    <input type="text" id="answerInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="在此输入英文...">
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row" id="answerRow">
+      <button class="secondary" id="skipBtn">跳过（看答案）</button>
+      <button class="primary" id="submitBtn">提交</button>
+    </div>
+    <div class="btn-row" id="nextRow" hidden>
+      <button class="primary" id="nextBtn">下一题 →</button>
+    </div>
+    <div class="stat-row">
+      <span>正确 <b id="correctCount">0</b></span>
+      <span>错误 <b id="wrongCount">0</b></span>
+      <span>剩余 <b id="remainCount">0</b></span>
+    </div>
+    <div class="link-back" id="backBtn">← 返回选择</div>
+  </div>
+
+  <div id="done" class="done-card" hidden>
+    <div class="big" id="doneEmoji">🎉</div>
+    <div style="font-size:1.2rem; font-weight:600;" id="doneTitle">全部完成！</div>
+    <div style="color:var(--muted); margin-top:6px;" id="doneStats"></div>
+    <button class="review" id="reviewBtn" hidden>针对错题再考一次</button>
+    <div class="btn-row">
+      <button class="secondary" id="restartBtn">再练一次（全部）</button>
+      <button class="primary" id="chooseAnotherBtn">选择其他内容</button>
+    </div>
+    <div class="wrong-book" id="wrongBook" hidden>
+      <div class="wrong-book-title">📖 错题本 · 请记住这些词</div>
+      <div class="wrong-list" id="wrongList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DECKS = [{"name": "全部量词短语", "cards": [{"cn": "一件衣物", "en": "an article of clothing", "tag": "daily items"}, {"cn": "一卷卫生纸", "en": "a roll of toilet paper", "tag": "daily items"}, {"cn": "一个毛线球", "en": "a ball of wool", "tag": "daily items"}, {"cn": "一块玻璃", "en": "a pane of glass", "tag": "daily items"}, {"cn": "一卷报纸", "en": "a roll of newspaper", "tag": "daily items"}, {"cn": "一块肥皂", "en": "a bar of soap", "tag": "daily items"}, {"cn": "一支牙膏", "en": "a tube of toothpaste", "tag": "daily items"}, {"cn": "一盒香烟", "en": "a packet of cigarettes", "tag": "daily items"}, {"cn": "一支粉笔", "en": "a stick/piece of chalk", "tag": "daily items"}, {"cn": "一叠纸", "en": "a pad of paper", "tag": "daily items"}, {"cn": "一群狗", "en": "a pack of dogs", "tag": "animals & people"}, {"cn": "一群猴子", "en": "a troop of monkeys", "tag": "animals & people"}, {"cn": "一窝小鸡", "en": "a brood of chicks", "tag": "animals & people"}, {"cn": "一群蝗虫", "en": "a plague [pleɪg] of locusts", "tag": "animals & people"}, {"cn": "一群蜜蜂", "en": "a swarm of bees", "tag": "animals & people"}, {"cn": "一群驼鹿", "en": "a gang of elks", "tag": "animals & people"}, {"cn": "一群鱼", "en": "a school of fish", "tag": "animals & people"}, {"cn": "一群狼", "en": "a pack of wolves", "tag": "animals & people"}, {"cn": "一群家畜", "en": "a herd of cattle", "tag": "animals & people"}, {"cn": "一群鸟", "en": "a flock of birds", "tag": "animals & people"}, {"cn": "一帮小偷（贬义）", "en": "a gang of thieves", "tag": "animals & people"}, {"cn": "一个唱诗班", "en": "a choir ['kwaɪə] of singers", "tag": "animals & people"}, {"cn": "一群示威者", "en": "a mob of demonstrators", "tag": "animals & people"}, {"cn": "一队士兵", "en": "a troop of soldiers", "tag": "animals & people"}, {"cn": "一组船员", "en": "a crew of sailors", "tag": "animals & people"}, {"cn": "一个冰淇淋球", "en": "a scoop of ice cream", "tag": "food"}, {"cn": "一块披萨", "en": "a slice of pizza", "tag": "food"}, {"cn": "一块巧克力", "en": "a bar of chocolate", "tag": "food"}, {"cn": "一个面包", "en": "a loaf of bread", "tag": "food"}, {"cn": "一粒米", "en": "a grain of rice", "tag": "food"}, {"cn": "一袋土豆", "en": "a sack of potatoes", "tag": "food"}, {"cn": "一块方糖", "en": "a cube of sugar", "tag": "food"}, {"cn": "一篮蔬菜", "en": "a basket of vegetables", "tag": "food"}, {"cn": "一把玉米", "en": "a handful of corn", "tag": "food"}, {"cn": "一篮子鸡蛋", "en": "a basket of eggs", "tag": "food"}, {"cn": "一箱香蕉", "en": "a crate of bananas", "tag": "food"}, {"cn": "一串葡萄", "en": "a bunch of grapes", "tag": "food"}, {"cn": "少量盐", "en": "a dash of salt", "tag": "food"}, {"cn": "一瓣蒜", "en": "a clove of garlic", "tag": "food"}, {"cn": "一勺药水", "en": "a teaspoon of medicine", "tag": "liquids"}, {"cn": "一碗汤", "en": "a bowl of soup", "tag": "liquids"}, {"cn": "一壶茶", "en": "a pot of tea", "tag": "liquids"}, {"cn": "一杯咖啡", "en": "a cup of coffee", "tag": "liquids"}, {"cn": "一罐柠檬汁", "en": "a jug of lemonade", "tag": "liquids"}, {"cn": "一盒果汁", "en": "a carton of juice", "tag": "liquids"}, {"cn": "一罐啤酒", "en": "a can of beer", "tag": "liquids"}, {"cn": "一桶啤酒", "en": "a keg of beer", "tag": "liquids"}, {"cn": "一瓶牛奶", "en": "a bottle of milk", "tag": "liquids"}, {"cn": "一杯牛奶", "en": "a glass of milk", "tag": "liquids"}, {"cn": "一箱油", "en": "a tank of gas", "tag": "liquids"}, {"cn": "一小杯伏特加", "en": "a shot of vodka", "tag": "liquids"}, {"cn": "一滴雨水", "en": "a drop of rain", "tag": "liquids"}, {"cn": "一加仑汽油", "en": "a gallon of gasoline", "tag": "liquids"}, {"cn": "一片原野", "en": "a stretch of field", "tag": "nature"}, {"cn": "一道闪电", "en": "a bolt of lightning", "tag": "nature"}, {"cn": "一片月光", "en": "a flood of moonlight", "tag": "nature"}, {"cn": "一束光线", "en": "a beam of light", "tag": "nature"}, {"cn": "一层岩石", "en": "a layer of rock", "tag": "nature"}, {"cn": "一团烟雾", "en": "a cloud of smoke", "tag": "nature"}, {"cn": "一片草叶", "en": "a blade of grass", "tag": "nature"}, {"cn": "一块木头", "en": "a block of wood", "tag": "nature"}, {"cn": "一层薄冰", "en": "a thin coat of ice", "tag": "nature"}, {"cn": "一股风", "en": "a gust of wind", "tag": "nature"}, {"cn": "一片花海", "en": "a field of flowers", "tag": "nature"}, {"cn": "口若悬河", "en": "a flood of words", "tag": "abstract things"}, {"cn": "一丝微笑", "en": "a wisp of a smile", "tag": "abstract things"}, {"cn": "一阵笑声", "en": "a burst of laughter", "tag": "abstract things"}, {"cn": "泪如泉涌", "en": "a flood of tears", "tag": "abstract things"}, {"cn": "一连串的想法", "en": "a train of thoughts", "tag": "abstract things"}, {"cn": "一条消息", "en": "a piece of information", "tag": "abstract things"}, {"cn": "一线希望", "en": "a glimmer of hope", "tag": "abstract things"}, {"cn": "铁路网", "en": "a network of railroad", "tag": "abstract things"}, {"cn": "人潮如涌", "en": "a flood of people", "tag": "abstract things"}, {"cn": "一条建议", "en": "a piece of advice", "tag": "abstract things"}]}];
+
+function normalize(s) {
+  return s.toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[.,!?;:"“”]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isCorrect(userInput, answerField) {
+  const user = normalize(userInput);
+  if (!user) return false;
+  const alts = answerField.split('/').map(a => normalize(a));
+  return alts.includes(user);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const setupEl = document.getElementById('setup');
+const quizEl = document.getElementById('quiz');
+const doneEl = document.getElementById('done');
+const deckListEl = document.getElementById('deckList');
+const shuffleOpt = document.getElementById('shuffleOpt');
+
+let state = null;
+
+function renderDeckList() {
+  deckListEl.innerHTML = '';
+  DECKS.forEach((deck, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'deck-btn';
+    btn.innerHTML = `<span>${deck.name}</span><span class="count">${deck.cards.length} 题</span>`;
+    btn.onclick = () => startDeck(idx);
+    deckListEl.appendChild(btn);
+  });
+}
+
+function startDeck(idx, cardsOverride, label) {
+  const deck = DECKS[idx];
+  let cards = cardsOverride
+    ? cardsOverride.map((c) => ({...c}))
+    : deck.cards.map((c, i) => ({...c, id: i}));
+  if (shuffleOpt.checked) cards = shuffle(cards);
+  const isReview = !!cardsOverride;
+  state = {
+    deckIdx: idx,
+    queue: cards,
+    total: cards.length,
+    correct: 0,
+    wrong: 0,
+    current: null,
+    attemptedWrongOnCurrent: false,
+    wrongMap: (isReview && state) ? state.wrongMap : {},
+    isReview: isReview,
+  };
+  setupEl.hidden = true;
+  doneEl.hidden = true;
+  quizEl.hidden = false;
+  document.getElementById('deckTag').textContent = label || deck.name;
+  showAnswerRow();
+  nextCard();
+}
+
+function showAnswerRow() {
+  document.getElementById('answerRow').hidden = false;
+  document.getElementById('nextRow').hidden = true;
+}
+function showNextRow() {
+  document.getElementById('answerRow').hidden = true;
+  document.getElementById('nextRow').hidden = false;
+  document.getElementById('nextBtn').focus();
+}
+
+function nextCard() {
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback';
+  feedback.textContent = '';
+  const input = document.getElementById('answerInput');
+  input.value = '';
+  input.disabled = false;
+  document.getElementById('submitBtn').disabled = false;
+  showAnswerRow();
+
+  if (state.queue.length === 0) {
+    finishDeck();
+    return;
+  }
+  state.current = state.queue[0];
+  state.attemptedWrongOnCurrent = false;
+  document.getElementById('promptCn').textContent = state.current.cn;
+  updateStats();
+  input.focus();
+}
+
+function advanceCard() {
+  state.queue.shift();
+  nextCard();
+}
+
+function updateStats() {
+  document.getElementById('correctCount').textContent = state.correct;
+  document.getElementById('wrongCount').textContent = state.wrong;
+  document.getElementById('remainCount').textContent = state.queue.length;
+  const done = state.total - state.queue.length;
+  document.getElementById('progressText').textContent = `${done} / ${state.total}`;
+  document.getElementById('progressFill').style.width = `${(done / state.total) * 100}%`;
+}
+
+function markWrong(card) {
+  if (!state.attemptedWrongOnCurrent) {
+    state.wrong++;
+    state.attemptedWrongOnCurrent = true;
+    updateStats();
+  }
+  state.wrongMap[card.id] = card;
+}
+
+function markSolved(card) {
+  // answered correctly on first try during an error-review round: it's learned, drop it
+  if (state.isReview) delete state.wrongMap[card.id];
+}
+
+function submitAnswer() {
+  const input = document.getElementById('answerInput');
+  const feedback = document.getElementById('feedback');
+  const val = input.value;
+  if (!val.trim()) return;
+  const card = state.current;
+  if (isCorrect(val, card.en)) {
+    feedback.className = 'feedback good show';
+    feedback.innerHTML = `✓ 正确！ <span class="answer">${card.en}</span>`;
+    if (!state.attemptedWrongOnCurrent) {
+      state.correct++;
+      markSolved(card);
+    }
+    input.disabled = true;
+    updateStats();
+    showNextRow();
+  } else {
+    feedback.className = 'feedback bad show';
+    feedback.innerHTML = `✗ 不对，再试一次`;
+    markWrong(card);
+    input.select();
+  }
+}
+
+function skipCard() {
+  const card = state.current;
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback bad show';
+  feedback.innerHTML = `正确答案： <span class="answer">${card.en}</span> —— 记住它，下次再考`;
+  markWrong(card);
+  document.getElementById('answerInput').disabled = true;
+  showNextRow();
+}
+
+function finishDeck() {
+  quizEl.hidden = true;
+  doneEl.hidden = false;
+  const wrongCards = Object.values(state.wrongMap);
+  const reviewBtn = document.getElementById('reviewBtn');
+  const wrongBook = document.getElementById('wrongBook');
+  const wrongList = document.getElementById('wrongList');
+
+  if (wrongCards.length > 0) {
+    document.getElementById('doneEmoji').textContent = '📝';
+    document.getElementById('doneTitle').textContent = '本轮完成';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次，还有 ${wrongCards.length} 个错题待巩固`;
+    reviewBtn.hidden = false;
+    reviewBtn.textContent = `针对错题再考一次（${wrongCards.length} 题）`;
+    wrongBook.hidden = false;
+    wrongList.innerHTML = wrongCards.map(c =>
+      `<div class="wrong-item"><span class="cn">${c.cn}</span><span class="en">${c.en}</span></div>`
+    ).join('');
+  } else {
+    document.getElementById('doneEmoji').textContent = '🎉';
+    document.getElementById('doneTitle').textContent = state.isReview ? '错题全部攻克！' : '全部完成！';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次`;
+    reviewBtn.hidden = true;
+    wrongBook.hidden = true;
+  }
+}
+
+document.getElementById('submitBtn').onclick = submitAnswer;
+document.getElementById('skipBtn').onclick = skipCard;
+document.getElementById('nextBtn').onclick = advanceCard;
+document.getElementById('answerInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitAnswer();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !document.getElementById('nextRow').hidden) advanceCard();
+});
+document.getElementById('backBtn').onclick = () => {
+  quizEl.hidden = true;
+  setupEl.hidden = false;
+};
+document.getElementById('restartBtn').onclick = () => startDeck(state.deckIdx);
+document.getElementById('reviewBtn').onclick = () => {
+  const wrongCards = Object.values(state.wrongMap);
+  startDeck(state.deckIdx, wrongCards, `${DECKS[state.deckIdx].name} · 错题重考`);
+};
+document.getElementById('chooseAnotherBtn').onclick = () => {
+  doneEl.hidden = true;
+  setupEl.hidden = false;
+};
+
+renderDeckList();
+</script>
+</body>
+</html>

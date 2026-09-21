@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>造句专用名词表 · 英文考查</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card-bg: #ffffff;
+    --text: #1c1e21;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --accent-2: #4f46e5;
+    --good: #16a34a;
+    --good-bg: #ecfdf3;
+    --bad: #dc2626;
+    --bad-bg: #fef2f2;
+    --pill-bg: #eef2ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111318;
+      --card-bg: #1b1e24;
+      --text: #e8eaed;
+      --muted: #9aa1ac;
+      --border: #2b2f38;
+      --accent: #60a5fa;
+      --accent-2: #818cf8;
+      --good: #4ade80;
+      --good-bg: #0f2a1a;
+      --bad: #f87171;
+      --bad-bg: #2a1414;
+      --pill-bg: #1e2436;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+  .setup-card, .quiz-card, .done-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .deck-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0 20px; }
+  .deck-btn {
+    text-align: left;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--pill-bg);
+    color: var(--text);
+    font-size: 0.98rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .deck-btn:hover { border-color: var(--accent); }
+  .deck-btn .count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+  .opt-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 0.9rem; color: var(--muted); }
+  .opt-row input { accent-color: var(--accent); }
+
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.85rem; color: var(--muted); }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 4px; margin: 0 12px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .25s ease; }
+
+  .prompt-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+  .prompt-cn { font-size: 1.6rem; font-weight: 600; line-height: 1.4; margin-bottom: 22px; white-space: pre-line; }
+
+  input[type=text] {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+
+  .dual-input-row { display: flex; gap: 12px; }
+  .input-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .input-group label { font-size: 0.78rem; color: var(--muted); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  button.primary, button.secondary {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.primary { background: var(--accent); color: white; }
+  button.primary:active { background: var(--accent-2); }
+  button.secondary { background: var(--pill-bg); color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; display: none; }
+  .feedback.show { display: block; }
+  .feedback.good { background: var(--good-bg); color: var(--good); }
+  .feedback.bad { background: var(--bad-bg); color: var(--bad); }
+  .feedback .answer { color: var(--text); font-weight: 600; }
+
+  .stat-row { display: flex; gap: 16px; font-size: 0.85rem; color: var(--muted); margin-top: 16px; }
+  .stat-row b { color: var(--text); }
+
+  .done-card { text-align: center; }
+  .done-card .big { font-size: 2.2rem; margin-bottom: 6px; }
+  .link-back { display: block; text-align: center; margin-top: 18px; color: var(--muted); font-size: 0.85rem; cursor: pointer; }
+  [hidden] { display: none !important; }
+
+  .wrong-book { text-align: left; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .wrong-book-title { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+  .wrong-list { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .wrong-item { display: flex; justify-content: space-between; gap: 12px; background: var(--bad-bg); border-radius: 8px; padding: 8px 12px; font-size: 0.9rem; }
+  .wrong-item .cn { color: var(--text); }
+  .wrong-item .en { color: var(--bad); font-weight: 600; white-space: nowrap; }
+  button.review {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bad);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>造句专用名词表 · 英文考查</h1>
+  <div class="subtitle">共 397 个常用名词（人物 73 个 + 事物 324 个）</div>
+
+  <div id="setup" class="setup-card">
+    <div style="font-weight:600; margin-bottom: 4px;">选择练习内容</div>
+    <div style="font-size:0.85rem; color: var(--muted);">看中文提示，同时写出单数和复数；两个都答对且勾选"加入熟悉库"时会存入熟悉词库，只要有一个答错就会自动存入错题库。</div>
+    <div class="deck-list" id="deckList"></div>
+    <label class="opt-row"><input type="checkbox" id="shuffleOpt" checked> 打乱顺序</label>
+  </div>
+
+  <div id="quiz" class="quiz-card" hidden>
+    <div class="top-bar">
+      <span id="progressText">1 / 1</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span id="deckTag"></span>
+    </div>
+    <div class="prompt-label" id="promptLabel">请同时写出对应的单数和复数</div>
+    <div class="prompt-cn" id="promptCn"></div>
+    <div class="dual-input-row">
+      <div class="input-group">
+        <label for="singularInput">单数</label>
+        <input type="text" id="singularInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="单数形式...">
+      </div>
+      <div class="input-group">
+        <label for="pluralInput">复数</label>
+        <input type="text" id="pluralInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="复数形式...">
+      </div>
+    </div>
+    <label class="opt-row"><input type="checkbox" id="familiarCheck"> 两个都答对的话，加入"熟悉词库"</label>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row" id="answerRow">
+      <button class="secondary" id="skipBtn">跳过（看答案）</button>
+      <button class="primary" id="submitBtn">提交</button>
+    </div>
+    <div class="btn-row" id="nextRow" hidden>
+      <button class="primary" id="nextBtn">下一题 →</button>
+    </div>
+    <div class="stat-row">
+      <span>正确 <b id="correctCount">0</b></span>
+      <span>错误 <b id="wrongCount">0</b></span>
+      <span>剩余 <b id="remainCount">0</b></span>
+    </div>
+    <div class="link-back" id="backBtn">← 返回选择</div>
+  </div>
+
+  <div id="done" class="done-card" hidden>
+    <div class="big" id="doneEmoji">🎉</div>
+    <div style="font-size:1.2rem; font-weight:600;" id="doneTitle">全部完成！</div>
+    <div style="color:var(--muted); margin-top:6px;" id="doneStats"></div>
+    <button class="review" id="reviewBtn" hidden>针对错题再考一次</button>
+    <div class="btn-row">
+      <button class="secondary" id="restartBtn">再练一次（全部）</button>
+      <button class="primary" id="chooseAnotherBtn">选择其他内容</button>
+    </div>
+    <div class="wrong-book" id="wrongBook" hidden>
+      <div class="wrong-book-title">📖 错题本 · 请记住这些词</div>
+      <div class="wrong-list" id="wrongList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [{"cn": "父亲", "singular": "father", "plural": "fathers", "id": 0}, {"cn": "母亲", "singular": "mother", "plural": "mothers", "id": 1}, {"cn": "伯父, 叔父, 姨丈 舅舅", "singular": "uncle", "plural": "uncles", "id": 2}, {"cn": "阿姨 舅妈，姑姑 伯母", "singular": "aunt", "plural": "aunts", "id": 3}, {"cn": "姐妹", "singular": "sister", "plural": "sisters", "id": 4}, {"cn": "兄弟", "singular": "brother", "plural": "brothers", "id": 5}, {"cn": "丈夫", "singular": "husband", "plural": "husbands", "id": 6}, {"cn": "妻子", "singular": "wife", "plural": "wives", "id": 7}, {"cn": "儿子", "singular": "son", "plural": "sons", "id": 8}, {"cn": "女儿", "singular": "daughter", "plural": "daughters", "id": 9}, {"cn": "人，男人", "singular": "man", "plural": "men", "id": 10}, {"cn": "女人", "singular": "woman", "plural": "women", "id": 11}, {"cn": "男孩", "singular": "boy", "plural": "boys", "id": 12}, {"cn": "女孩", "singular": "girl", "plural": "girls", "id": 13}, {"cn": "婴儿", "singular": "baby", "plural": "babies", "id": 14}, {"cn": "朋友", "singular": "friend", "plural": "friends", "id": 15}, {"cn": "女朋友", "singular": "girlfriend", "plural": "girlfriends", "id": 16}, {"cn": "男朋友", "singular": "boyfriend", "plural": "boyfriends", "id": 17}, {"cn": "网友", "singular": "net friend", "plural": "net friends", "id": 18}, {"cn": "同学", "singular": "classmate", "plural": "classmates", "id": 19}, {"cn": "室友", "singular": "roommate", "plural": "roommates", "id": 20}, {"cn": "同事", "singular": "colleague", "plural": "colleagues", "id": 21}, {"cn": "同事", "singular": "co-worker", "plural": "co-workers", "id": 22}, {"cn": "客户", "singular": "customer", "plural": "customers/clients", "id": 23}, {"cn": "主人", "singular": "host", "plural": "hosts", "id": 24}, {"cn": "女主人", "singular": "hostess", "plural": "hostesses", "id": 25}, {"cn": "客人", "singular": "guest", "plural": "guests", "id": 26}, {"cn": "伙伴，搭档，合作伙伴", "singular": "partner", "plural": "partners", "id": 27}, {"cn": "粉丝", "singular": "fan", "plural": "fans", "id": 28}, {"cn": "刑警，侦探", "singular": "detective", "plural": "detectives", "id": 29}, {"cn": "消防人员", "singular": "firefighter", "plural": "firefighters", "id": 30}, {"cn": "邮差", "singular": "mailman", "plural": "mailmen", "id": 31}, {"cn": "出租车司机", "singular": "taxi driver", "plural": "taxi drivers", "id": 32}, {"cn": "送奶人", "singular": "milkman", "plural": "milkmen", "id": 33}, {"cn": "面包师", "singular": "baker", "plural": "bakers", "id": 34}, {"cn": "肉贩 屠夫", "singular": "butcher", "plural": "butchers", "id": 35}, {"cn": "女店员", "singular": "saleswoman", "plural": "saleswomen", "id": 36}, {"cn": "空中小姐", "singular": "stewardess", "plural": "stewardesses", "id": 37}, {"cn": "空中小姐", "singular": "air-hostess", "plural": "air-hostesses", "id": 38}, {"cn": "牙科医生", "singular": "dentist", "plural": "dentists", "id": 39}, {"cn": "医生", "singular": "doctor", "plural": "doctors", "id": 40}, {"cn": "护士", "singular": "nurse", "plural": "nurses", "id": 41}, {"cn": "设计师", "singular": "designer", "plural": "designers", "id": 42}, {"cn": "西装师傅 裁缝", "singular": "tailor", "plural": "tailors", "id": 43}, {"cn": "秘书", "singular": "secretary", "plural": "secretaries", "id": 44}, {"cn": "警察", "singular": "policeman", "plural": "policemen", "id": 45}, {"cn": "画家", "singular": "painter", "plural": "painters", "id": 46}, {"cn": "音乐家", "singular": "musician", "plural": "musicians", "id": 47}, {"cn": "歌唱家 歌手", "singular": "singer", "plural": "singers", "id": 48}, {"cn": "打字员", "singular": "typist", "plural": "typists", "id": 49}, {"cn": "会计", "singular": "accountant", "plural": "accountants", "id": 50}, {"cn": "男演员", "singular": "actor", "plural": "actors", "id": 51}, {"cn": "女演员", "singular": "actress", "plural": "actresses", "id": 52}, {"cn": "清洁工", "singular": "cleaner", "plural": "cleaners", "id": 53}, {"cn": "跳舞者；舞蹈演", "singular": "dancer", "plural": "dancers", "id": 54}, {"cn": "工程师；技", "singular": "engineer", "plural": "engineers", "id": 55}, {"cn": "农民；农场主", "singular": "farmer", "plural": "farmers", "id": 56}, {"cn": "电", "singular": "film  director", "plural": "film directors", "id": 57}, {"cn": "律师", "singular": "lawyer", "plural": "lawyers", "id": 58}, {"cn": "经理", "singular": "manager", "plural": "managers", "id": 59}, {"cn": "保姆", "singular": "nanny", "plural": "nannies", "id": 60}, {"cn": "记者", "singular": "reporter", "plural": "reporters", "id": 61}, {"cn": "船员；水手", "singular": "sailor", "plural": "sailors", "id": 62}, {"cn": "科学家", "singular": "scientist", "plural": "scientists", "id": 63}, {"cn": "士兵", "singular": "soldier", "plural": "soldiers", "id": 64}, {"cn": "教师", "singular": "teacher", "plural": "teachers", "id": 65}, {"cn": "学生", "singular": "student", "plural": "students", "id": 66}, {"cn": "工人", "singular": "worker", "plural": "workers", "id": 67}, {"cn": "男侍者 男服务员", "singular": "waiter", "plural": "waiters", "id": 68}, {"cn": "女 侍 者 女 服", "singular": "waitress", "plural": "waitresses", "id": 69}, {"cn": "作家", "singular": "writer", "plural": "writers", "id": 70}, {"cn": "导游", "singular": "guide", "plural": "guides", "id": 71}, {"cn": "领导", "singular": "leader", "plural": "leaders", "id": 72}, {"cn": "空气", "singular": "air", "plural": "不可数名词", "id": 73}, {"cn": "飞机", "singular": "airplane", "plural": "airplanes", "id": 74}, {"cn": "机场", "singular": "airport", "plural": "airports", "id": 75}, {"cn": "动物.", "singular": "animal", "plural": "animals", "id": 76}, {"cn": "回答，答案", "singular": "answer", "plural": "answers", "id": 77}, {"cn": "公寓", "singular": "apartment", "plural": "apartments", "id": 78}, {"cn": "苹果", "singular": "apple", "plural": "apples", "id": 79}, {"cn": "臂", "singular": "arm", "plural": "arms", "id": 80}, {"cn": "艺术", "singular": "art", "plural": "不可数名词", "id": 81}, {"cn": "秋天", "singular": "autumn", "plural": "autumns", "id": 82}, {"cn": "袋子", "singular": "bag", "plural": "bags", "id": 83}, {"cn": "面包店", "singular": "bakery", "plural": "bakeries", "id": 84}, {"cn": "球", "singular": "ball", "plural": "balls", "id": 85}, {"cn": "香蕉", "singular": "banana", "plural": "bananas", "id": 86}, {"cn": "乐队", "singular": "band", "plural": "bands", "id": 87}, {"cn": "银行", "singular": "bank", "plural": "banks", "id": 88}, {"cn": "棒球", "singular": "baseball", "plural": "baseballs", "id": 89}, {"cn": "篮子", "singular": "basket", "plural": "baskets", "id": 90}, {"cn": "篮球", "singular": "basketball", "plural": "basketballs", "id": 91}, {"cn": "浴室", "singular": "bathroom", "plural": "bathrooms", "id": 92}, {"cn": "海滩", "singular": "beach", "plural": "beaches", "id": 93}, {"cn": "熊", "singular": "bear", "plural": "bears", "id": 94}, {"cn": "床", "singular": "bed", "plural": "beds", "id": 95}, {"cn": "卧室", "singular": "bedroom", "plural": "bedrooms", "id": 96}, {"cn": "蜜蜂", "singular": "bee", "plural": "bees", "id": 97}, {"cn": "牛肉", "singular": "beef", "plural": "不可数名词", "id": 98}, {"cn": "钟，铃", "singular": "bell", "plural": "bells", "id": 99}, {"cn": "自行车", "singular": "bike", "plural": "bikes", "id": 100}, {"cn": "鸟", "singular": "bird", "plural": "birds", "id": 101}, {"cn": "生日", "singular": "birthday", "plural": "birthdays", "id": 102}, {"cn": "黑板", "singular": "blackboard", "plural": "blackboards", "id": 103}, {"cn": "小船", "singular": "boat", "plural": "boats", "id": 104}, {"cn": "身体", "singular": "body", "plural": "bodies", "id": 105}, {"cn": "书", "singular": "book", "plural": "books", "id": 106}, {"cn": "书店", "singular": "bookstore", "plural": "bookstores", "id": 107}, {"cn": "碗", "singular": "bowl", "plural": "bowls", "id": 108}, {"cn": "箱子", "singular": "box", "plural": "boxes", "id": 109}, {"cn": "面包", "singular": "bread", "plural": "不可数名词", "id": 110}, {"cn": "早餐", "singular": "breakfast", "plural": "breakfasts", "id": 111}, {"cn": "桥", "singular": "bridge", "plural": "bridges", "id": 112}, {"cn": "兄弟", "singular": "brother", "plural": "brothers", "id": 113}, {"cn": "刷子", "singular": "brush", "plural": "brushes", "id": 114}, {"cn": "汽车", "singular": "bus", "plural": "buses", "id": 115}, {"cn": "蛋糕也可以做不可数名", "singular": "cake", "plural": "cakes", "id": 116}, {"cn": "照相机", "singular": "camera", "plural": "cameras", "id": 117}, {"cn": "数码相机", "singular": "digital  camera", "plural": "digital cameras", "id": 118}, {"cn": "糖果", "singular": "candy", "plural": "candies", "id": 119}, {"cn": "帽子", "singular": "cap", "plural": "caps", "id": 120}, {"cn": "小车", "singular": "car", "plural": "cars", "id": 121}, {"cn": "卡片", "singular": "card", "plural": "cards", "id": 122}, {"cn": "盒子，案例", "singular": "case", "plural": "cases", "id": 123}, {"cn": "猫", "singular": "cat", "plural": "cats", "id": 124}, {"cn": "椅子", "singular": "chair", "plural": "chairs", "id": 125}, {"cn": "粉笔（可数与不可数都可以）", "singular": "chalk", "plural": "chalks", "id": 126}, {"cn": "鸡；鸡肉（表示鸡可数，表示鸡肉不可数）", "singular": "chicken", "plural": "chickens", "id": 127}, {"cn": "小孩", "singular": "child", "plural": "children", "id": 128}, {"cn": "巧克力", "singular": "chocolate", "plural": "不可数名词", "id": 129}, {"cn": "筷子", "singular": "chopstick", "plural": "chopsticks", "id": 130}, {"cn": "教堂", "singular": "church", "plural": "churches", "id": 131}, {"cn": "城市", "singular": "city", "plural": "cities", "id": 132}, {"cn": "班级，课", "singular": "class", "plural": "classes", "id": 133}, {"cn": "教室", "singular": "classroom", "plural": "classrooms", "id": 134}, {"cn": "钟", "singular": "clock", "plural": "clocks", "id": 135}, {"cn": "衣服", "singular": "clothes", "plural": "（本身就是复数名词）", "id": 136}, {"cn": "大衣", "singular": "coat", "plural": "coats", "id": 137}, {"cn": "咖啡", "singular": "coffee", "plural": "不可数名词", "id": 138}, {"cn": "颜色", "singular": "color", "plural": "colors", "id": 139}, {"cn": "电脑", "singular": "computer", "plural": "computers", "id": 140}, {"cn": "厨师", "singular": "cook", "plural": "cooks", "id": 141}, {"cn": "小甜饼", "singular": "cookie", "plural": "cookies", "id": 142}, {"cn": "国家，乡村", "singular": "country", "plural": "countries", "id": 143}, {"cn": "盖子，封面", "singular": "cover", "plural": "covers", "id": 144}, {"cn": "奶牛", "singular": "cow", "plural": "cows", "id": 145}, {"cn": "杯子", "singular": "cup", "plural": "cups", "id": 146}, {"cn": "日期，约会", "singular": "date", "plural": "dates", "id": 147}, {"cn": "天，日子", "singular": "day", "plural": "days", "id": 148}, {"cn": "书桌", "singular": "desk", "plural": "desks", "id": 149}, {"cn": "字典", "singular": "dictionary", "plural": "dictionaries", "id": 150}, {"cn": "饭厅", "singular": "dining room", "plural": "dining rooms", "id": 151}, {"cn": "正餐", "singular": "dinner", "plural": "dinners", "id": 152}, {"cn": "盘子，碟子", "singular": "dish", "plural": "dishes", "id": 153}, {"cn": "狗", "singular": "dog", "plural": "dogs", "id": 154}, {"cn": "洋娃娃", "singular": "doll", "plural": "dolls", "id": 155}, {"cn": "美元", "singular": "dollar", "plural": "dollars", "id": 156}, {"cn": "门", "singular": "door", "plural": "doors", "id": 157}, {"cn": "女装，服装", "singular": "dress", "plural": "dresses", "id": 158}, {"cn": "电子邮件", "singular": "e-mail", "plural": "e-mails", "id": 159}, {"cn": "耳朵", "singular": "ear", "plural": "ears", "id": 160}, {"cn": "大象", "singular": "elephant", "plural": "elephants", "id": 161}, {"cn": "橡皮擦", "singular": "eraser", "plural": "erasers", "id": 162}, {"cn": "傍晚", "singular": "evening", "plural": "evenings", "id": 163}, {"cn": "借口.", "singular": "excuse", "plural": "excuses", "id": 164}, {"cn": "练习", "singular": "exercise", "plural": "exercises", "id": 165}, {"cn": "眼睛", "singular": "eye", "plural": "eyes", "id": 166}, {"cn": "脸", "singular": "face", "plural": "faces", "id": 167}, {"cn": "工厂", "singular": "factory", "plural": "factories", "id": 168}, {"cn": "家庭", "singular": "family", "plural": "families", "id": 169}, {"cn": "农场", "singular": "farm", "plural": "farms", "id": 170}, {"cn": "鱼（表示鱼的数量可数，表示鱼肉不可数）", "singular": "fish", "plural": "fish/fishes", "id": 171}, {"cn": "地板", "singular": "floor", "plural": "floors", "id": 172}, {"cn": "花", "singular": "flower", "plural": "flowers", "id": 173}, {"cn": "苍蝇", "singular": "fly", "plural": "flies", "id": 174}, {"cn": "食物", "singular": "food", "plural": "不可数名词", "id": 175}, {"cn": "脚", "singular": "foot", "plural": "feet", "id": 176}, {"cn": "叉子", "singular": "fork", "plural": "forks", "id": 177}, {"cn": "水果", "singular": "fruit", "plural": "fruits", "id": 178}, {"cn": "游戏，比赛", "singular": "game", "plural": "games", "id": 179}, {"cn": "垃圾", "singular": "garbage", "plural": "不可数名词", "id": 180}, {"cn": "花园", "singular": "garden", "plural": "gardens", "id": 181}, {"cn": "礼物", "singular": "gift", "plural": "gifts", "id": 182}, {"cn": "手套", "singular": "glove", "plural": "gloves", "id": 183}, {"cn": "山羊", "singular": "goat", "plural": "goats", "id": 184}, {"cn": "头发", "singular": "hair", "plural": "不可数名词", "id": 185}, {"cn": "火腿", "singular": "ham", "plural": "hams", "id": 186}, {"cn": "汉堡包", "singular": "hamburger", "plural": "hamburgers", "id": 187}, {"cn": "手", "singular": "hand", "plural": "hands", "id": 188}, {"cn": "帽子", "singular": "hat", "plural": "hats", "id": 189}, {"cn": "头", "singular": "head", "plural": "heads", "id": 190}, {"cn": "心", "singular": "heart", "plural": "hearts", "id": 191}, {"cn": "小山", "singular": "hill", "plural": "hills", "id": 192}, {"cn": "历史", "singular": "history", "plural": "不可数名词", "id": 193}, {"cn": "业余爱好", "singular": "hobby", "plural": "hobbies", "id": 194}, {"cn": "假期", "singular": "holiday", "plural": "holidays", "id": 195}, {"cn": "家", "singular": "home", "plural": "homes", "id": 196}, {"cn": "家 庭 作", "singular": "homework", "plural": "不可数名词", "id": 197}, {"cn": "希望", "singular": "hope", "plural": "不可数名词", "id": 198}, {"cn": "马", "singular": "horse", "plural": "horses", "id": 199}, {"cn": "医院", "singular": "hospital", "plural": "hospitals", "id": 200}, {"cn": "热狗", "singular": "hot dog", "plural": "hot dogs", "id": 201}, {"cn": "房子", "singular": "house", "plural": "houses", "id": 202}, {"cn": "冰", "singular": "ice", "plural": "不可数名词", "id": 203}, {"cn": "冰激凌", "singular": "ice cream", "plural": "ice creams", "id": 204}, {"cn": "想法", "singular": "idea", "plural": "ideas", "id": 205}, {"cn": "兴趣，", "singular": "interest", "plural": "interests", "id": 206}, {"cn": "互联网", "singular": "internet", "plural": "不可数名词", "id": 207}, {"cn": "岛屿", "singular": "island", "plural": "islands", "id": 208}, {"cn": "夹克", "singular": "jacket", "plural": "jackets", "id": 209}, {"cn": "牛仔裤（只有复数形式，表示一条可用量词 a pair of）", "singular": "jeans", "plural": "jeans", "id": 210}, {"cn": "工作", "singular": "job", "plural": "jobs", "id": 211}, {"cn": "果汁", "singular": "juice", "plural": "不可数名词", "id": 212}, {"cn": "钥匙", "singular": "key", "plural": "keys", "id": 213}, {"cn": "小孩", "singular": "kid", "plural": "kids", "id": 214}, {"cn": "公斤", "singular": "kilogram", "plural": "kilograms", "id": 215}, {"cn": "国王", "singular": "king", "plural": "kings", "id": 216}, {"cn": "吻", "singular": "kiss", "plural": "kisses", "id": 217}, {"cn": "厨房", "singular": "kitchen", "plural": "kitchens", "id": 218}, {"cn": "风筝", "singular": "kite", "plural": "kites", "id": 219}, {"cn": "膝盖", "singular": "knee", "plural": "knees", "id": 220}, {"cn": "刀", "singular": "knife", "plural": "knives", "id": 221}, {"cn": "知识", "singular": "knowledge", "plural": "不可数名词", "id": 222}, {"cn": "湖", "singular": "lake", "plural": "lakes", "id": 223}, {"cn": "灯", "singular": "lamp", "plural": "lamps", "id": 224}, {"cn": "陆地", "singular": "land", "plural": "lands", "id": 225}, {"cn": "语言", "singular": "language", "plural": "languages", "id": 226}, {"cn": "腿", "singular": "leg", "plural": "legs", "id": 227}, {"cn": "柠檬", "singular": "lemon", "plural": "lemons", "id": 228}, {"cn": "课，功课", "singular": "lesson", "plural": "lessons", "id": 229}, {"cn": "信，字母", "singular": "letter", "plural": "letters", "id": 230}, {"cn": "图书馆", "singular": "library", "plural": "libraries", "id": 231}, {"cn": "生活（不可数）；生命（可数）", "singular": "life", "plural": "lives", "id": 232}, {"cn": "灯，光线", "singular": "light", "plural": "lights", "id": 233}, {"cn": "线路", "singular": "line", "plural": "lines", "id": 234}, {"cn": "狮子", "singular": "lion", "plural": "lions", "id": 235}, {"cn": "嘴唇", "singular": "lip", "plural": "lips", "id": 236}, {"cn": "名单", "singular": "list", "plural": "lists", "id": 237}, {"cn": "客", "singular": "living   room", "plural": "living rooms", "id": 238}, {"cn": "爱", "singular": "love", "plural": "不可数名词", "id": 239}, {"cn": "午餐", "singular": "lunch", "plural": "lunches", "id": 240}, {"cn": "机器", "singular": "machine", "plural": "machines", "id": 241}, {"cn": "邮件", "singular": "mail", "plural": "mails", "id": 242}, {"cn": "地图", "singular": "map", "plural": "maps", "id": 243}, {"cn": "市场", "singular": "market", "plural": "markets", "id": 244}, {"cn": "数学", "singular": "math", "plural": "不可数名词", "id": 245}, {"cn": "一餐", "singular": "meal", "plural": "meals", "id": 246}, {"cn": "肉", "singular": "meat", "plural": "不可数名词", "id": 247}, {"cn": "药（可数/不可数，“一片药”可用 pill/tablet）", "singular": "medicine", "plural": "medicines", "id": 248}, {"cn": "会议", "singular": "meeting", "plural": "meetings", "id": 249}, {"cn": "菜单", "singular": "menu", "plural": "menus", "id": 250}, {"cn": "英里", "singular": "mile", "plural": "miles", "id": 251}, {"cn": "牛奶", "singular": "milk", "plural": "不可数名词", "id": 252}, {"cn": "分钟", "singular": "minute", "plural": "minutes", "id": 253}, {"cn": "错误", "singular": "mistake", "plural": "mistakes", "id": 254}, {"cn": "时刻", "singular": "moment", "plural": "moments", "id": 255}, {"cn": "钱", "singular": "money", "plural": "不可数名词", "id": 256}, {"cn": "猴子", "singular": "monkey", "plural": "monkeys", "id": 257}, {"cn": "月份", "singular": "month", "plural": "months", "id": 258}, {"cn": "月亮（专指月球时加 the，无复数；表示“天然卫星”是可数名词）", "singular": "moon", "plural": "moons", "id": 259}, {"cn": "早上", "singular": "morning", "plural": "mornings", "id": 260}, {"cn": "山", "singular": "mountain", "plural": "mountains", "id": 261}, {"cn": "老鼠，鼠标", "singular": "mouse", "plural": "mice", "id": 262}, {"cn": "[ 嘴", "singular": "mouth", "plural": "mouths", "id": 263}, {"cn": "电影", "singular": "movie", "plural": "movies", "id": 264}, {"cn": "博物馆", "singular": "museum", "plural": "museums", "id": 265}, {"cn": "音乐", "singular": "music", "plural": "不可数名词", "id": 266}, {"cn": "名字", "singular": "name", "plural": "names", "id": 267}, {"cn": "脖子", "singular": "neck", "plural": "necks", "id": 268}, {"cn": "新闻", "singular": "news", "plural": "不可数名词", "id": 269}, {"cn": "夜晚", "singular": "night", "plural": "nights", "id": 270}, {"cn": "面条", "singular": "noodle", "plural": "noodles", "id": 271}, {"cn": "中午", "singular": "noon", "plural": "noons", "id": 272}, {"cn": "鼻子", "singular": "nose", "plural": "noses", "id": 273}, {"cn": "笔记本", "singular": "notebook", "plural": "notebooks", "id": 274}, {"cn": "通知", "singular": "notice", "plural": "notices", "id": 275}, {"cn": "数字", "singular": "number", "plural": "numbers", "id": 276}, {"cn": "办公室", "singular": "office", "plural": "offices", "id": 277}, {"cn": "油", "singular": "oil", "plural": "不可数名词", "id": 278}, {"cn": "橘子", "singular": "orange", "plural": "oranges", "id": 279}, {"cn": "页", "singular": "page", "plural": "pages", "id": 280}, {"cn": "裤子（只有复数形式，表示一条可用量词 a pair of）", "singular": "pants", "plural": "pants", "id": 281}, {"cn": "纸", "singular": "paper", "plural": "不可数名词", "id": 282}, {"cn": "公园", "singular": "park", "plural": "parks", "id": 283}, {"cn": "聚会", "singular": "party", "plural": "parties", "id": 284}, {"cn": "钢笔", "singular": "pen", "plural": "pens", "id": 285}, {"cn": "铅笔.", "singular": "pencil", "plural": "pencils", "id": 286}, {"cn": "人民，人们", "singular": "people", "plural": "复数名词", "id": 287}, {"cn": "人", "singular": "person", "plural": "persons", "id": 288}, {"cn": "宠物", "singular": "pet", "plural": "pets", "id": 289}, {"cn": "钢琴", "singular": "piano", "plural": "pianos", "id": 290}, {"cn": "图片，相片", "singular": "picture", "plural": "pictures", "id": 291}, {"cn": "馅饼", "singular": "pie", "plural": "pies", "id": 292}, {"cn": "猪", "singular": "pig", "plural": "pigs", "id": 293}, {"cn": "地方", "singular": "place", "plural": "places", "id": 294}, {"cn": "计划", "singular": "plan", "plural": "plans", "id": 295}, {"cn": "运动场", "singular": "playground", "plural": "playgrounds", "id": 296}, {"cn": "分数", "singular": "point", "plural": "points", "id": 297}, {"cn": "猪肉", "singular": "pork", "plural": "不可数名词", "id": 298}, {"cn": "邮局", "singular": "post   office", "plural": "post offices", "id": 299}, {"cn": "礼物", "singular": "present", "plural": "presents", "id": 300}, {"cn": "价格", "singular": "price", "plural": "prices", "id": 301}, {"cn": "问题", "singular": "problem", "plural": "problems", "id": 302}, {"cn": "节目", "singular": "program", "plural": "programs", "id": 303}, {"cn": "问题，疑问", "singular": "question", "plural": "questions", "id": 304}, {"cn": "兔子", "singular": "rabbit", "plural": "rabbits", "id": 305}, {"cn": "收音机", "singular": "radio", "plural": "radios", "id": 306}, {"cn": "铁路", "singular": "railway", "plural": "railways", "id": 307}, {"cn": "雨", "singular": "rain", "plural": "不可数名词", "id": 308}, {"cn": "冰箱", "singular": "refrigerator", "plural": "refrigerators", "id": 309}, {"cn": "餐馆", "singular": "restaurant", "plural": "restaurants", "id": 310}, {"cn": "大米", "singular": "rice", "plural": "不可数名词", "id": 311}, {"cn": "戒子，环", "singular": "ring", "plural": "rings", "id": 312}, {"cn": "河，江", "singular": "river", "plural": "rivers", "id": 313}, {"cn": "道路", "singular": "road", "plural": "roads", "id": 314}, {"cn": "房间", "singular": "room", "plural": "rooms", "id": 315}, {"cn": "玫瑰花", "singular": "rose", "plural": "roses", "id": 316}, {"cn": "规则", "singular": "rule", "plural": "rules", "id": 317}, {"cn": "尺子", "singular": "ruler", "plural": "rulers", "id": 318}, {"cn": "保险箱", "singular": "safe", "plural": "safes", "id": 319}, {"cn": "盐", "singular": "salt", "plural": "不可数名词", "id": 320}, {"cn": "学校", "singular": "school", "plural": "schools", "id": 321}, {"cn": "大海", "singular": "sea", "plural": "seas", "id": 322}, {"cn": "座位", "singular": "seat", "plural": "seats", "id": 323}, {"cn": "秒", "singular": "second", "plural": "seconds", "id": 324}, {"cn": "句子", "singular": "sentence", "plural": "sentences", "id": 325}, {"cn": "绵羊", "singular": "sheep", "plural": "sheep", "id": 326}, {"cn": "船", "singular": "ship", "plural": "ships", "id": 327}, {"cn": "衬衫", "singular": "shirt", "plural": "shirts", "id": 328}, {"cn": "鞋子", "singular": "shoe", "plural": "shoes", "id": 329}, {"cn": "尺寸", "singular": "size", "plural": "sizes", "id": 330}, {"cn": "短裙", "singular": "skirt", "plural": "skirts", "id": 331}, {"cn": "天空", "singular": "sky", "plural": "skies", "id": 332}, {"cn": "微笑", "singular": "smile", "plural": "smiles", "id": 333}, {"cn": "雪", "singular": "snow", "plural": "不可数名词", "id": 334}, {"cn": "袜子", "singular": "sock", "plural": "socks", "id": 335}, {"cn": "沙发", "singular": "sofa", "plural": "sofas", "id": 336}, {"cn": "歌曲", "singular": "song", "plural": "songs", "id": 337}, {"cn": "声音，噪音", "singular": "sound", "plural": "不可数名词", "id": 338}, {"cn": "汤", "singular": "soup", "plural": "不可数名词", "id": 339}, {"cn": "南方", "singular": "south", "plural": "不可数名词", "id": 340}, {"cn": "勺子", "singular": "spoon", "plural": "spoons", "id": 341}, {"cn": "运动", "singular": "sport", "plural": "sports", "id": 342}, {"cn": "春天", "singular": "spring", "plural": "springs", "id": 343}, {"cn": "星星，明星", "singular": "star", "plural": "stars", "id": 344}, {"cn": "车站", "singular": "station", "plural": "stations", "id": 345}, {"cn": "牛排", "singular": "steak", "plural": "steaks", "id": 346}, {"cn": "商店", "singular": "store", "plural": "stores", "id": 347}, {"cn": "故事", "singular": "story", "plural": "stories", "id": 348}, {"cn": "街道", "singular": "street", "plural": "streets", "id": 349}, {"cn": "学习，研究", "singular": "study", "plural": "不可数名词", "id": 350}, {"cn": "糖", "singular": "sugar", "plural": "不可数名词", "id": 351}, {"cn": "夏天", "singular": "summer", "plural": "summers", "id": 352}, {"cn": "太阳（独一无二，加冠词 the；表“恒星”是可数名词）", "singular": "sun", "plural": "suns", "id": 353}, {"cn": "超", "singular": "supermarket", "plural": "supermarkets", "id": 354}, {"cn": "毛衣", "singular": "sweater", "plural": "sweaters", "id": 355}, {"cn": "桌", "singular": "table", "plural": "tables", "id": 356}, {"cn": "出租车", "singular": "taxi", "plural": "taxis", "id": 357}, {"cn": "茶", "singular": "tea", "plural": "不可数名词", "id": 358}, {"cn": "团队", "singular": "team", "plural": "teams", "id": 359}, {"cn": "电话", "singular": "telephone", "plural": "telephones", "id": 360}, {"cn": "电视", "singular": "television", "plural": "televisions", "id": 361}, {"cn": "网球", "singular": "tennis", "plural": "不可数名词", "id": 362}, {"cn": "剧院", "singular": "theater", "plural": "theaters", "id": 363}, {"cn": "事情，事物", "singular": "thing", "plural": "things", "id": 364}, {"cn": "票", "singular": "ticket", "plural": "tickets", "id": 365}, {"cn": "老虎", "singular": "tiger", "plural": "tigers", "id": 366}, {"cn": "时间（不可数）；次数（可数）", "singular": "time", "plural": "times", "id": 367}, {"cn": "番茄，西红柿", "singular": "tomato", "plural": "tomatoes", "id": 368}, {"cn": "牙齿", "singular": "tooth", "plural": "teeth", "id": 369}, {"cn": "毛巾", "singular": "towel", "plural": "towels", "id": 370}, {"cn": "镇", "singular": "town", "plural": "towns", "id": 371}, {"cn": "玩具", "singular": "toy", "plural": "toys", "id": 372}, {"cn": "火车", "singular": "train", "plural": "trains", "id": 373}, {"cn": "树", "singular": "tree", "plural": "trees", "id": 374}, {"cn": "旅游,旅行", "singular": "trip", "plural": "trips", "id": 375}, {"cn": "雨伞", "singular": "umbrella", "plural": "umbrellas", "id": 376}, {"cn": "制服", "singular": "uniform", "plural": "uniforms", "id": 377}, {"cn": "假", "singular": "vacation", "plural": "vacations", "id": 378}, {"cn": "蔬菜", "singular": "vegetable", "plural": "vegetables", "id": 379}, {"cn": "录像，视频", "singular": "video", "plural": "videos", "id": 380}, {"cn": "墙壁", "singular": "wall", "plural": "walls", "id": 381}, {"cn": "手表", "singular": "watch", "plural": "watches", "id": 382}, {"cn": "水", "singular": "water", "plural": "不可数名词", "id": 383}, {"cn": "道路，方法", "singular": "way", "plural": "ways", "id": 384}, {"cn": "天气", "singular": "weather", "plural": "不可数名词", "id": 385}, {"cn": "周", "singular": "week", "plural": "weeks", "id": 386}, {"cn": "周", "singular": "weekend", "plural": "weekends", "id": 387}, {"cn": "水井", "singular": "well", "plural": "wells", "id": 388}, {"cn": "风", "singular": "wind", "plural": "不可数名词", "id": 389}, {"cn": "窗户", "singular": "window", "plural": "windows", "id": 390}, {"cn": "冬天", "singular": "winter", "plural": "winters", "id": 391}, {"cn": "词语，单词", "singular": "word", "plural": "words", "id": 392}, {"cn": "工作", "singular": "work", "plural": "不可数名词", "id": 393}, {"cn": "世界（独一无二时加 the；特指某个世界时是可数名词）", "singular": "world", "plural": "worlds", "id": 394}, {"cn": "年", "singular": "year", "plural": "years", "id": 395}, {"cn": "动物园", "singular": "zoo", "plural": "zoos", "id": 396}];
+
+function normalize(s) {
+  return s.toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[.,!?;:"“”]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isCorrect(userInput, answerField) {
+  const user = normalize(userInput);
+  if (!user) return false;
+  const alts = answerField.split('/').map(a => normalize(a));
+  return alts.includes(user);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const setupEl = document.getElementById('setup');
+const quizEl = document.getElementById('quiz');
+const doneEl = document.getElementById('done');
+const deckListEl = document.getElementById('deckList');
+const shuffleOpt = document.getElementById('shuffleOpt');
+
+const STORAGE_KEYS = { familiar: 'nounQuizFamiliarIds', wrong: 'nounQuizWrongIds' };
+
+function loadIdSet(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (e) {
+    return new Set();
+  }
+}
+function saveIdSet(key, set) {
+  try { localStorage.setItem(key, JSON.stringify([...set])); } catch (e) {}
+}
+
+let familiarIds = loadIdSet(STORAGE_KEYS.familiar);
+let wrongIds = loadIdSet(STORAGE_KEYS.wrong);
+
+function wordsByIds(idSet) {
+  return WORDS.filter(w => idSet.has(w.id));
+}
+
+const DECKS = [
+  { key: 'all', name: '名词表（单数+复数一起考）', getCards: () => WORDS },
+  { key: 'familiar', name: '熟悉词库', getCards: () => wordsByIds(familiarIds) },
+  { key: 'wrong', name: '错题库', getCards: () => wordsByIds(wrongIds) },
+];
+
+let state = null;
+
+function renderDeckList() {
+  deckListEl.innerHTML = '';
+  DECKS.forEach((deck, idx) => {
+    const cards = deck.getCards();
+    const btn = document.createElement('button');
+    btn.className = 'deck-btn';
+    btn.innerHTML = `<span>${deck.name}</span><span class="count">${cards.length} 题</span>`;
+    btn.disabled = cards.length === 0;
+    btn.onclick = () => startDeck(idx);
+    deckListEl.appendChild(btn);
+  });
+}
+
+function startDeck(idx) {
+  const deck = DECKS[idx];
+  let cards = deck.getCards().map((c) => ({...c}));
+  if (cards.length === 0) return;
+  if (shuffleOpt.checked) cards = shuffle(cards);
+  state = {
+    deckIdx: idx,
+    queue: cards,
+    total: cards.length,
+    correct: 0,
+    wrong: 0,
+    current: null,
+    wrongList: [],
+  };
+  setupEl.hidden = true;
+  doneEl.hidden = true;
+  quizEl.hidden = false;
+  document.getElementById('deckTag').textContent = deck.name;
+  showAnswerRow();
+  nextCard();
+}
+
+function showAnswerRow() {
+  document.getElementById('answerRow').hidden = false;
+  document.getElementById('nextRow').hidden = true;
+}
+function showNextRow() {
+  document.getElementById('answerRow').hidden = true;
+  document.getElementById('nextRow').hidden = false;
+  document.getElementById('nextBtn').focus();
+}
+
+function nextCard() {
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback';
+  feedback.innerHTML = '';
+  const singularInput = document.getElementById('singularInput');
+  const pluralInput = document.getElementById('pluralInput');
+  const familiarCheck = document.getElementById('familiarCheck');
+  singularInput.value = '';
+  pluralInput.value = '';
+  singularInput.disabled = false;
+  pluralInput.disabled = false;
+  familiarCheck.checked = false;
+  familiarCheck.disabled = false;
+  document.getElementById('submitBtn').disabled = false;
+  showAnswerRow();
+
+  if (state.queue.length === 0) {
+    finishDeck();
+    return;
+  }
+  state.current = state.queue[0];
+  document.getElementById('promptCn').textContent = state.current.cn;
+  updateStats();
+  singularInput.focus();
+}
+
+function advanceCard() {
+  state.queue.shift();
+  nextCard();
+}
+
+function updateStats() {
+  document.getElementById('correctCount').textContent = state.correct;
+  document.getElementById('wrongCount').textContent = state.wrong;
+  document.getElementById('remainCount').textContent = state.queue.length;
+  const done = state.total - state.queue.length;
+  document.getElementById('progressText').textContent = `${done} / ${state.total}`;
+  document.getElementById('progressFill').style.width = `${(done / state.total) * 100}%`;
+}
+
+function gradeCard(card, singularOk, pluralOk) {
+  const familiarCheck = document.getElementById('familiarCheck');
+  if (singularOk && pluralOk) {
+    state.correct++;
+    wrongIds.delete(card.id);
+    if (familiarCheck.checked) familiarIds.add(card.id);
+  } else {
+    state.wrong++;
+    familiarIds.delete(card.id);
+    wrongIds.add(card.id);
+    state.wrongList.push(card);
+  }
+  saveIdSet(STORAGE_KEYS.familiar, familiarIds);
+  saveIdSet(STORAGE_KEYS.wrong, wrongIds);
+  updateStats();
+  renderDeckList();
+}
+
+function submitAnswer() {
+  const singularInput = document.getElementById('singularInput');
+  const pluralInput = document.getElementById('pluralInput');
+  const feedback = document.getElementById('feedback');
+  if (!singularInput.value.trim() && !pluralInput.value.trim()) return;
+  const card = state.current;
+  const singularOk = isCorrect(singularInput.value, card.singular);
+  const pluralOk = isCorrect(pluralInput.value, card.plural);
+
+  gradeCard(card, singularOk, pluralOk);
+
+  if (singularOk && pluralOk) {
+    feedback.className = 'feedback good show';
+    feedback.innerHTML = `✓ 全对！单数 <span class="answer">${card.singular}</span> · 复数 <span class="answer">${card.plural}</span>`;
+  } else {
+    feedback.className = 'feedback bad show';
+    feedback.innerHTML = `✗ 正确答案 —— 单数：<span class="answer">${card.singular}</span>（${singularOk ? '✓' : '✗'}） 复数：<span class="answer">${card.plural}</span>（${pluralOk ? '✓' : '✗'}） · 已加入错题库`;
+  }
+  singularInput.disabled = true;
+  pluralInput.disabled = true;
+  document.getElementById('familiarCheck').disabled = true;
+  showNextRow();
+}
+
+function skipCard() {
+  const card = state.current;
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback bad show';
+  feedback.innerHTML = `正确答案 —— 单数：<span class="answer">${card.singular}</span> 复数：<span class="answer">${card.plural}</span> · 已加入错题库`;
+  gradeCard(card, false, false);
+  document.getElementById('singularInput').disabled = true;
+  document.getElementById('pluralInput').disabled = true;
+  document.getElementById('familiarCheck').disabled = true;
+  showNextRow();
+}
+
+function finishDeck() {
+  quizEl.hidden = true;
+  doneEl.hidden = false;
+  const wrongCards = state.wrongList;
+  const reviewBtn = document.getElementById('reviewBtn');
+  const wrongBook = document.getElementById('wrongBook');
+  const wrongList = document.getElementById('wrongList');
+
+  if (wrongCards.length > 0) {
+    document.getElementById('doneEmoji').textContent = '📝';
+    document.getElementById('doneTitle').textContent = '本轮完成';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次，已自动存入错题库`;
+    reviewBtn.hidden = false;
+    reviewBtn.textContent = `去错题库再考一次（${wrongIds.size} 题）`;
+    wrongBook.hidden = false;
+    wrongList.innerHTML = wrongCards.map(c =>
+      `<div class="wrong-item"><span class="cn">${c.cn}</span><span class="en">${c.singular} / ${c.plural}</span></div>`
+    ).join('');
+  } else {
+    document.getElementById('doneEmoji').textContent = '🎉';
+    document.getElementById('doneTitle').textContent = '全部完成！';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次`;
+    reviewBtn.hidden = true;
+    wrongBook.hidden = true;
+  }
+  renderDeckList();
+}
+
+document.getElementById('submitBtn').onclick = submitAnswer;
+document.getElementById('skipBtn').onclick = skipCard;
+document.getElementById('nextBtn').onclick = advanceCard;
+document.getElementById('singularInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('pluralInput').focus();
+});
+document.getElementById('pluralInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitAnswer();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !document.getElementById('nextRow').hidden) advanceCard();
+});
+document.getElementById('backBtn').onclick = () => {
+  quizEl.hidden = true;
+  setupEl.hidden = false;
+  renderDeckList();
+};
+document.getElementById('restartBtn').onclick = () => startDeck(state.deckIdx);
+document.getElementById('reviewBtn').onclick = () => startDeck(DECKS.findIndex(d => d.key === 'wrong'));
+document.getElementById('chooseAnotherBtn').onclick = () => {
+  doneEl.hidden = true;
+  setupEl.hidden = false;
+  renderDeckList();
+};
+
+renderDeckList();
+</script>
+</body>
+</html>

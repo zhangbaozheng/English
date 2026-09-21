@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>造句专用形容词表 · 英文考查</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card-bg: #ffffff;
+    --text: #1c1e21;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --accent-2: #4f46e5;
+    --good: #16a34a;
+    --good-bg: #ecfdf3;
+    --bad: #dc2626;
+    --bad-bg: #fef2f2;
+    --pill-bg: #eef2ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111318;
+      --card-bg: #1b1e24;
+      --text: #e8eaed;
+      --muted: #9aa1ac;
+      --border: #2b2f38;
+      --accent: #60a5fa;
+      --accent-2: #818cf8;
+      --good: #4ade80;
+      --good-bg: #0f2a1a;
+      --bad: #f87171;
+      --bad-bg: #2a1414;
+      --pill-bg: #1e2436;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+  .setup-card, .quiz-card, .done-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .deck-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0 20px; }
+  .deck-btn {
+    text-align: left;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--pill-bg);
+    color: var(--text);
+    font-size: 0.98rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .deck-btn:hover { border-color: var(--accent); }
+  .deck-btn .count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+  .opt-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 0.9rem; color: var(--muted); }
+  .opt-row input { accent-color: var(--accent); }
+
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.85rem; color: var(--muted); }
+  .progress-track { flex: 1; height: 6px; background: var(--border); border-radius: 4px; margin: 0 12px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .25s ease; }
+
+  .prompt-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+  .prompt-cn { font-size: 1.6rem; font-weight: 600; line-height: 1.4; margin-bottom: 22px; white-space: pre-line; }
+
+  input[type=text] {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  button.primary, button.secondary {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.primary { background: var(--accent); color: white; }
+  button.primary:active { background: var(--accent-2); }
+  button.secondary { background: var(--pill-bg); color: var(--text); border: 1px solid var(--border); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 0.95rem; display: none; }
+  .feedback.show { display: block; }
+  .feedback.good { background: var(--good-bg); color: var(--good); }
+  .feedback.bad { background: var(--bad-bg); color: var(--bad); }
+  .feedback .answer { color: var(--text); font-weight: 600; }
+
+  .stat-row { display: flex; gap: 16px; font-size: 0.85rem; color: var(--muted); margin-top: 16px; }
+  .stat-row b { color: var(--text); }
+
+  .done-card { text-align: center; }
+  .done-card .big { font-size: 2.2rem; margin-bottom: 6px; }
+  .link-back { display: block; text-align: center; margin-top: 18px; color: var(--muted); font-size: 0.85rem; cursor: pointer; }
+  [hidden] { display: none !important; }
+
+  .wrong-book { text-align: left; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .wrong-book-title { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+  .wrong-list { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .wrong-item { display: flex; justify-content: space-between; gap: 12px; background: var(--bad-bg); border-radius: 8px; padding: 8px 12px; font-size: 0.9rem; }
+  .wrong-item .cn { color: var(--text); }
+  .wrong-item .en { color: var(--bad); font-weight: 600; white-space: nowrap; }
+  button.review {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bad);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>造句专用形容词表 · 英文考查</h1>
+  <div class="subtitle">共 115 个常用形容词及其比较级、最高级</div>
+
+  <div id="setup" class="setup-card">
+    <div style="font-weight:600; margin-bottom: 4px;">选择练习内容</div>
+    <div style="font-size:0.85rem; color: var(--muted);">看中文提示，写出对应的英文；答对或查看答案后，需手动点击"下一题"。做错的词会被记入错题本，可在完成后针对错题单独再考。</div>
+    <div class="deck-list" id="deckList"></div>
+    <label class="opt-row"><input type="checkbox" id="shuffleOpt" checked> 打乱顺序</label>
+  </div>
+
+  <div id="quiz" class="quiz-card" hidden>
+    <div class="top-bar">
+      <span id="progressText">1 / 1</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span id="deckTag"></span>
+    </div>
+    <div class="prompt-label" id="promptLabel">请写出对应的英文</div>
+    <div class="prompt-cn" id="promptCn"></div>
+    <input type="text" id="answerInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="在此输入英文...">
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row" id="answerRow">
+      <button class="secondary" id="skipBtn">跳过（看答案）</button>
+      <button class="primary" id="submitBtn">提交</button>
+    </div>
+    <div class="btn-row" id="nextRow" hidden>
+      <button class="primary" id="nextBtn">下一题 →</button>
+    </div>
+    <div class="stat-row">
+      <span>正确 <b id="correctCount">0</b></span>
+      <span>错误 <b id="wrongCount">0</b></span>
+      <span>剩余 <b id="remainCount">0</b></span>
+    </div>
+    <div class="link-back" id="backBtn">← 返回选择</div>
+  </div>
+
+  <div id="done" class="done-card" hidden>
+    <div class="big" id="doneEmoji">🎉</div>
+    <div style="font-size:1.2rem; font-weight:600;" id="doneTitle">全部完成！</div>
+    <div style="color:var(--muted); margin-top:6px;" id="doneStats"></div>
+    <button class="review" id="reviewBtn" hidden>针对错题再考一次</button>
+    <div class="btn-row">
+      <button class="secondary" id="restartBtn">再练一次（全部）</button>
+      <button class="primary" id="chooseAnotherBtn">选择其他内容</button>
+    </div>
+    <div class="wrong-book" id="wrongBook" hidden>
+      <div class="wrong-book-title">📖 错题本 · 请记住这些词</div>
+      <div class="wrong-list" id="wrongList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DECKS = [{"name": "只考原级", "cards": [{"cn": "有能力的", "en": "capable", "tag": ""}, {"cn": "害怕的", "en": "afraid", "tag": ""}, {"cn": "单独的", "en": "alone", "tag": ""}, {"cn": "生气的", "en": "angry", "tag": ""}, {"cn": "坏的；严重的", "en": "bad", "tag": ""}, {"cn": "美丽的", "en": "beautiful", "tag": ""}, {"cn": "大的", "en": "big", "tag": ""}, {"cn": "黑色的", "en": "black", "tag": ""}, {"cn": "蓝色的", "en": "blue", "tag": ""}, {"cn": "明亮的；聪明的", "en": "bright", "tag": ""}, {"cn": "棕（褐）色的", "en": "brown", "tag": ""}, {"cn": "忙的", "en": "busy", "tag": ""}, {"cn": "小心仔细的", "en": "careful", "tag": ""}, {"cn": "便宜的", "en": "cheap", "tag": ""}, {"cn": "干净的；清洁的", "en": "clean", "tag": ""}, {"cn": "清晰的；清楚的；清澈的", "en": "clear", "tag": ""}, {"cn": "关闭的；亲密的；近的", "en": "close", "tag": ""}, {"cn": "多云的", "en": "cloudy", "tag": ""}, {"cn": "冷的；寒冷的", "en": "cold", "tag": ""}, {"cn": "凉的；凉快的", "en": "cool", "tag": ""}, {"cn": "危险的", "en": "dangerous", "tag": ""}, {"cn": "黑暗的；深色的", "en": "dark", "tag": ""}, {"cn": "死的", "en": "dead", "tag": ""}, {"cn": "深的", "en": "deep", "tag": ""}, {"cn": "美味的；可口的", "en": "delicious", "tag": ""}, {"cn": "不同的；差异的", "en": "different", "tag": ""}, {"cn": "困难的；艰难的", "en": "difficult", "tag": ""}, {"cn": "脏的", "en": "dirty", "tag": ""}, {"cn": "干的；干燥的", "en": "dry", "tag": ""}, {"cn": "容易的", "en": "easy", "tag": ""}, {"cn": "空的", "en": "empty", "tag": ""}, {"cn": "昂贵的", "en": "expensive", "tag": ""}, {"cn": "著名的，有名的", "en": "famous", "tag": ""}, {"cn": "远的", "en": "far", "tag": ""}, {"cn": "快的", "en": "fast", "tag": ""}, {"cn": "最喜爱的；中意的", "en": "favourite", "tag": ""}, {"cn": "晴朗的；（身体）很好", "en": "fine", "tag": ""}, {"cn": "外国的", "en": "foreign", "tag": ""}, {"cn": "空闲的", "en": "free", "tag": ""}, {"cn": "友好的", "en": "friendly", "tag": ""}, {"cn": "满的；饱的", "en": "full", "tag": ""}, {"cn": "高兴的；乐意的", "en": "glad", "tag": ""}, {"cn": "好的；良好的", "en": "good", "tag": ""}, {"cn": "伟大的；重要的", "en": "great", "tag": ""}, {"cn": "绿色的", "en": "green", "tag": ""}, {"cn": "高兴的；幸福的", "en": "happy", "tag": ""}, {"cn": "困难的", "en": "hard", "tag": ""}, {"cn": "健康的", "en": "healthy", "tag": ""}, {"cn": "重的", "en": "heavy", "tag": ""}, {"cn": "高的", "en": "high", "tag": ""}, {"cn": "热的", "en": "hot", "tag": ""}, {"cn": "饥饿的", "en": "hungry", "tag": ""}, {"cn": "生病的；不健康的", "en": "ill", "tag": ""}, {"cn": "重要的", "en": "important", "tag": ""}, {"cn": "感兴趣的", "en": "interested", "tag": ""}, {"cn": "有趣的", "en": "interesting", "tag": ""}, {"cn": "友好的；和善的", "en": "kind", "tag": ""}, {"cn": "大的；巨大的", "en": "large", "tag": ""}, {"cn": "迟的；晚的", "en": "late", "tag": ""}, {"cn": "懒惰的", "en": "lazy", "tag": ""}, {"cn": "左边的", "en": "left", "tag": ""}, {"cn": "轻的；浅色的", "en": "light", "tag": ""}, {"cn": "长的；远的", "en": "long", "tag": ""}, {"cn": "大声的；响亮的", "en": "loud", "tag": ""}, {"cn": "低的；矮的；低声的", "en": "low", "tag": ""}, {"cn": "运气好的；侥幸的", "en": "lucky", "tag": ""}, {"cn": "许多的", "en": "many", "tag": ""}, {"cn": "现代的", "en": "modern", "tag": ""}, {"cn": "许多的；大量的", "en": "much", "tag": ""}, {"cn": "近的", "en": "near", "tag": ""}, {"cn": "新的；新鲜的", "en": "new", "tag": ""}, {"cn": "美好的；令人愉快的", "en": "nice", "tag": ""}, {"cn": "北方的", "en": "north", "tag": ""}, {"cn": "旧的；年老的", "en": "old", "tag": ""}, {"cn": "开着的；开口的", "en": "open", "tag": ""}, {"cn": "橙色的", "en": "orange", "tag": ""}, {"cn": "有礼貌的", "en": "polite", "tag": ""}, {"cn": "贫穷的", "en": "poor", "tag": ""}, {"cn": "流行的", "en": "popular", "tag": ""}, {"cn": "可能的，可能发生的", "en": "possible", "tag": ""}, {"cn": "快的；迅速的", "en": "quick", "tag": ""}, {"cn": "安静的", "en": "quiet", "tag": ""}, {"cn": "准备好的", "en": "ready", "tag": ""}, {"cn": "红色的", "en": "red", "tag": ""}, {"cn": "富裕的；有钱的", "en": "rich", "tag": ""}, {"cn": "右边的；正确的", "en": "right", "tag": ""}, {"cn": "圆的；球形的", "en": "round", "tag": ""}, {"cn": "悲伤的；使人悲伤的", "en": "sad", "tag": ""}, {"cn": "严重的；认真的", "en": "serious", "tag": ""}, {"cn": "几个；若干", "en": "several", "tag": ""}, {"cn": "短的；矮的", "en": "short", "tag": ""}, {"cn": "生病的；有病的", "en": "sick", "tag": ""}, {"cn": "慢的；缓慢的", "en": "slow", "tag": ""}, {"cn": "小的；少的", "en": "small", "tag": ""}, {"cn": "对不起的；难过的", "en": "sorry", "tag": ""}, {"cn": "强壮的，牢固的", "en": "strong", "tag": ""}, {"cn": "确信的", "en": "sure", "tag": ""}, {"cn": "甜的", "en": "sweet", "tag": ""}, {"cn": "高的", "en": "tall", "tag": ""}, {"cn": "可怕的；极不舒服的", "en": "terrible", "tag": ""}, {"cn": "瘦的；薄的", "en": "thin", "tag": ""}, {"cn": "口渴的", "en": "thirsty", "tag": ""}, {"cn": "疲劳的；累的", "en": "tired", "tag": ""}, {"cn": "真的；真实的", "en": "true", "tag": ""}, {"cn": "有用的；有益的", "en": "useful", "tag": ""}, {"cn": "暖和的；温暖的", "en": "warm", "tag": ""}, {"cn": "差的；弱的", "en": "weak", "tag": ""}, {"cn": "湿的；潮的", "en": "wet", "tag": ""}, {"cn": "西方的", "en": "west", "tag": ""}, {"cn": "白色的", "en": "white", "tag": ""}, {"cn": "宽的；宽阔的", "en": "wide", "tag": ""}, {"cn": "极好的；精彩的", "en": "wonderful", "tag": ""}, {"cn": "错误的；不对的", "en": "wrong", "tag": ""}, {"cn": "黄色的", "en": "yellow", "tag": ""}, {"cn": "年轻的", "en": "young", "tag": ""}]}, {"name": "考原级/比较级/最高级", "cards": [{"cn": "有能力的（原级）", "en": "capable", "tag": "原级"}, {"cn": "有能力的（比较级）", "en": "more capable", "tag": "比较级"}, {"cn": "有能力的（最高级）", "en": "most capable", "tag": "最高级"}, {"cn": "害怕的（原级）", "en": "afraid", "tag": "原级"}, {"cn": "害怕的（比较级）", "en": "more afraid", "tag": "比较级"}, {"cn": "害怕的（最高级）", "en": "most afraid", "tag": "最高级"}, {"cn": "单独的（原级）", "en": "alone", "tag": "原级"}, {"cn": "生气的（原级）", "en": "angry", "tag": "原级"}, {"cn": "生气的（比较级）", "en": "angrier", "tag": "比较级"}, {"cn": "生气的（最高级）", "en": "angriest", "tag": "最高级"}, {"cn": "坏的；严重的（原级）", "en": "bad", "tag": "原级"}, {"cn": "坏的；严重的（比较级）", "en": "worse", "tag": "比较级"}, {"cn": "坏的；严重的（最高级）", "en": "worst", "tag": "最高级"}, {"cn": "美丽的（原级）", "en": "beautiful", "tag": "原级"}, {"cn": "美丽的（比较级）", "en": "more beautiful", "tag": "比较级"}, {"cn": "美丽的（最高级）", "en": "most beautiful", "tag": "最高级"}, {"cn": "大的（原级）", "en": "big", "tag": "原级"}, {"cn": "大的（比较级）", "en": "bigger", "tag": "比较级"}, {"cn": "大的（最高级）", "en": "biggest", "tag": "最高级"}, {"cn": "黑色的（原级）", "en": "black", "tag": "原级"}, {"cn": "黑色的（比较级）", "en": "blacker", "tag": "比较级"}, {"cn": "黑色的（最高级）", "en": "blackest", "tag": "最高级"}, {"cn": "蓝色的（原级）", "en": "blue", "tag": "原级"}, {"cn": "蓝色的（比较级）", "en": "bluer", "tag": "比较级"}, {"cn": "蓝色的（最高级）", "en": "bluest", "tag": "最高级"}, {"cn": "明亮的；聪明的（原级）", "en": "bright", "tag": "原级"}, {"cn": "明亮的；聪明的（比较级）", "en": "brighter", "tag": "比较级"}, {"cn": "明亮的；聪明的（最高级）", "en": "brightest", "tag": "最高级"}, {"cn": "棕（褐）色的（原级）", "en": "brown", "tag": "原级"}, {"cn": "棕（褐）色的（比较级）", "en": "browner", "tag": "比较级"}, {"cn": "棕（褐）色的（最高级）", "en": "brownest", "tag": "最高级"}, {"cn": "忙的（原级）", "en": "busy", "tag": "原级"}, {"cn": "忙的（比较级）", "en": "busier", "tag": "比较级"}, {"cn": "忙的（最高级）", "en": "busiest", "tag": "最高级"}, {"cn": "小心仔细的（原级）", "en": "careful", "tag": "原级"}, {"cn": "小心仔细的（比较级）", "en": "more careful", "tag": "比较级"}, {"cn": "小心仔细的（最高级）", "en": "most careful", "tag": "最高级"}, {"cn": "便宜的（原级）", "en": "cheap", "tag": "原级"}, {"cn": "便宜的（比较级）", "en": "cheaper", "tag": "比较级"}, {"cn": "便宜的（最高级）", "en": "cheapest", "tag": "最高级"}, {"cn": "干净的；清洁的（原级）", "en": "clean", "tag": "原级"}, {"cn": "干净的；清洁的（比较级）", "en": "cleaner", "tag": "比较级"}, {"cn": "干净的；清洁的（最高级）", "en": "cleanest", "tag": "最高级"}, {"cn": "清晰的；清楚的；清澈的（原级）", "en": "clear", "tag": "原级"}, {"cn": "清晰的；清楚的；清澈的（比较级）", "en": "clearer", "tag": "比较级"}, {"cn": "清晰的；清楚的；清澈的（最高级）", "en": "clearest", "tag": "最高级"}, {"cn": "关闭的；亲密的；近的（原级）", "en": "close", "tag": "原级"}, {"cn": "关闭的；亲密的；近的（比较级）", "en": "closer", "tag": "比较级"}, {"cn": "关闭的；亲密的；近的（最高级）", "en": "closest", "tag": "最高级"}, {"cn": "多云的（原级）", "en": "cloudy", "tag": "原级"}, {"cn": "冷的；寒冷的（原级）", "en": "cold", "tag": "原级"}, {"cn": "冷的；寒冷的（比较级）", "en": "colder", "tag": "比较级"}, {"cn": "冷的；寒冷的（最高级）", "en": "coldest", "tag": "最高级"}, {"cn": "凉的；凉快的（原级）", "en": "cool", "tag": "原级"}, {"cn": "凉的；凉快的（比较级）", "en": "cooler", "tag": "比较级"}, {"cn": "凉的；凉快的（最高级）", "en": "coolest", "tag": "最高级"}, {"cn": "危险的（原级）", "en": "dangerous", "tag": "原级"}, {"cn": "危险的（比较级）", "en": "more dangerous", "tag": "比较级"}, {"cn": "危险的（最高级）", "en": "most dangerous", "tag": "最高级"}, {"cn": "黑暗的；深色的（原级）", "en": "dark", "tag": "原级"}, {"cn": "黑暗的；深色的（比较级）", "en": "darker", "tag": "比较级"}, {"cn": "黑暗的；深色的（最高级）", "en": "darkest", "tag": "最高级"}, {"cn": "死的（原级）", "en": "dead", "tag": "原级"}, {"cn": "深的（原级）", "en": "deep", "tag": "原级"}, {"cn": "深的（比较级）", "en": "deeper", "tag": "比较级"}, {"cn": "深的（最高级）", "en": "deepest", "tag": "最高级"}, {"cn": "美味的；可口的（原级）", "en": "delicious", "tag": "原级"}, {"cn": "美味的；可口的（比较级）", "en": "more delicious", "tag": "比较级"}, {"cn": "美味的；可口的（最高级）", "en": "most delicious", "tag": "最高级"}, {"cn": "不同的；差异的（原级）", "en": "different", "tag": "原级"}, {"cn": "不同的；差异的（比较级）", "en": "more different", "tag": "比较级"}, {"cn": "不同的；差异的（最高级）", "en": "most different", "tag": "最高级"}, {"cn": "困难的；艰难的（原级）", "en": "difficult", "tag": "原级"}, {"cn": "困难的；艰难的（比较级）", "en": "more difficult", "tag": "比较级"}, {"cn": "困难的；艰难的（最高级）", "en": "most difficult", "tag": "最高级"}, {"cn": "脏的（原级）", "en": "dirty", "tag": "原级"}, {"cn": "脏的（比较级）", "en": "dirtier", "tag": "比较级"}, {"cn": "脏的（最高级）", "en": "dirtiest", "tag": "最高级"}, {"cn": "干的；干燥的（原级）", "en": "dry", "tag": "原级"}, {"cn": "干的；干燥的（比较级）", "en": "drier", "tag": "比较级"}, {"cn": "干的；干燥的（最高级）", "en": "driest", "tag": "最高级"}, {"cn": "容易的（原级）", "en": "easy", "tag": "原级"}, {"cn": "容易的（比较级）", "en": "easier", "tag": "比较级"}, {"cn": "容易的（最高级）", "en": "easiest", "tag": "最高级"}, {"cn": "空的（原级）", "en": "empty", "tag": "原级"}, {"cn": "空的（比较级）", "en": "emptier", "tag": "比较级"}, {"cn": "空的（最高级）", "en": "emptiest", "tag": "最高级"}, {"cn": "昂贵的（原级）", "en": "expensive", "tag": "原级"}, {"cn": "昂贵的（比较级）", "en": "more expensive", "tag": "比较级"}, {"cn": "昂贵的（最高级）", "en": "most expensive", "tag": "最高级"}, {"cn": "著名的，有名的（原级）", "en": "famous", "tag": "原级"}, {"cn": "著名的，有名的（比较级）", "en": "more famous", "tag": "比较级"}, {"cn": "著名的，有名的（最高级）", "en": "most famous", "tag": "最高级"}, {"cn": "远的（原级）", "en": "far", "tag": "原级"}, {"cn": "远的（比较级）", "en": "farther/further", "tag": "比较级"}, {"cn": "远的（最高级）", "en": "farthest/furthest", "tag": "最高级"}, {"cn": "快的（原级）", "en": "fast", "tag": "原级"}, {"cn": "快的（比较级）", "en": "faster", "tag": "比较级"}, {"cn": "快的（最高级）", "en": "fastest", "tag": "最高级"}, {"cn": "最喜爱的；中意的（原级）", "en": "favourite", "tag": "原级"}, {"cn": "晴朗的；（身体）很好（原级）", "en": "fine", "tag": "原级"}, {"cn": "晴朗的；（身体）很好（比较级）", "en": "finer", "tag": "比较级"}, {"cn": "晴朗的；（身体）很好（最高级）", "en": "finest", "tag": "最高级"}, {"cn": "外国的（原级）", "en": "foreign", "tag": "原级"}, {"cn": "空闲的（原级）", "en": "free", "tag": "原级"}, {"cn": "空闲的（比较级）", "en": "freer", "tag": "比较级"}, {"cn": "空闲的（最高级）", "en": "freest", "tag": "最高级"}, {"cn": "友好的（原级）", "en": "friendly", "tag": "原级"}, {"cn": "友好的（比较级）", "en": "friendlier", "tag": "比较级"}, {"cn": "友好的（最高级）", "en": "friendliest", "tag": "最高级"}, {"cn": "满的；饱的（原级）", "en": "full", "tag": "原级"}, {"cn": "满的；饱的（比较级）", "en": "fuller", "tag": "比较级"}, {"cn": "满的；饱的（最高级）", "en": "fullest", "tag": "最高级"}, {"cn": "高兴的；乐意的（原级）", "en": "glad", "tag": "原级"}, {"cn": "好的；良好的（原级）", "en": "good", "tag": "原级"}, {"cn": "好的；良好的（比较级）", "en": "better", "tag": "比较级"}, {"cn": "好的；良好的（最高级）", "en": "best", "tag": "最高级"}, {"cn": "伟大的；重要的（原级）", "en": "great", "tag": "原级"}, {"cn": "伟大的；重要的（比较级）", "en": "greater", "tag": "比较级"}, {"cn": "伟大的；重要的（最高级）", "en": "greatest", "tag": "最高级"}, {"cn": "绿色的（原级）", "en": "green", "tag": "原级"}, {"cn": "绿色的（比较级）", "en": "greener", "tag": "比较级"}, {"cn": "绿色的（最高级）", "en": "greenest", "tag": "最高级"}, {"cn": "高兴的；幸福的（原级）", "en": "happy", "tag": "原级"}, {"cn": "高兴的；幸福的（比较级）", "en": "happier", "tag": "比较级"}, {"cn": "高兴的；幸福的（最高级）", "en": "happiest", "tag": "最高级"}, {"cn": "困难的（原级）", "en": "hard", "tag": "原级"}, {"cn": "困难的（比较级）", "en": "harder", "tag": "比较级"}, {"cn": "困难的（最高级）", "en": "hardest", "tag": "最高级"}, {"cn": "健康的（原级）", "en": "healthy", "tag": "原级"}, {"cn": "健康的（比较级）", "en": "healthier", "tag": "比较级"}, {"cn": "健康的（最高级）", "en": "healthiest", "tag": "最高级"}, {"cn": "重的（原级）", "en": "heavy", "tag": "原级"}, {"cn": "重的（比较级）", "en": "heavier", "tag": "比较级"}, {"cn": "重的（最高级）", "en": "heaviest", "tag": "最高级"}, {"cn": "高的（原级）", "en": "high", "tag": "原级"}, {"cn": "高的（比较级）", "en": "higher", "tag": "比较级"}, {"cn": "高的（最高级）", "en": "highest", "tag": "最高级"}, {"cn": "热的（原级）", "en": "hot", "tag": "原级"}, {"cn": "热的（比较级）", "en": "hotter", "tag": "比较级"}, {"cn": "热的（最高级）", "en": "hottest", "tag": "最高级"}, {"cn": "饥饿的（原级）", "en": "hungry", "tag": "原级"}, {"cn": "饥饿的（比较级）", "en": "hungrier", "tag": "比较级"}, {"cn": "饥饿的（最高级）", "en": "hungriest", "tag": "最高级"}, {"cn": "生病的；不健康的（原级）", "en": "ill", "tag": "原级"}, {"cn": "生病的；不健康的（比较级）", "en": "worse", "tag": "比较级"}, {"cn": "生病的；不健康的（最高级）", "en": "worst", "tag": "最高级"}, {"cn": "重要的（原级）", "en": "important", "tag": "原级"}, {"cn": "重要的（比较级）", "en": "more important", "tag": "比较级"}, {"cn": "重要的（最高级）", "en": "most important", "tag": "最高级"}, {"cn": "感兴趣的（原级）", "en": "interested", "tag": "原级"}, {"cn": "感兴趣的（比较级）", "en": "more interested", "tag": "比较级"}, {"cn": "感兴趣的（最高级）", "en": "most interested", "tag": "最高级"}, {"cn": "有趣的（原级）", "en": "interesting", "tag": "原级"}, {"cn": "有趣的（比较级）", "en": "more interesting", "tag": "比较级"}, {"cn": "有趣的（最高级）", "en": "most interesting", "tag": "最高级"}, {"cn": "友好的；和善的（原级）", "en": "kind", "tag": "原级"}, {"cn": "友好的；和善的（比较级）", "en": "kinder", "tag": "比较级"}, {"cn": "友好的；和善的（最高级）", "en": "kindest", "tag": "最高级"}, {"cn": "大的；巨大的（原级）", "en": "large", "tag": "原级"}, {"cn": "大的；巨大的（比较级）", "en": "larger", "tag": "比较级"}, {"cn": "大的；巨大的（最高级）", "en": "largest", "tag": "最高级"}, {"cn": "迟的；晚的（原级）", "en": "late", "tag": "原级"}, {"cn": "迟的；晚的（比较级）", "en": "later", "tag": "比较级"}, {"cn": "迟的；晚的（最高级）", "en": "latest", "tag": "最高级"}, {"cn": "懒惰的（原级）", "en": "lazy", "tag": "原级"}, {"cn": "懒惰的（比较级）", "en": "lazier", "tag": "比较级"}, {"cn": "懒惰的（最高级）", "en": "laziest", "tag": "最高级"}, {"cn": "左边的（原级）", "en": "left", "tag": "原级"}, {"cn": "轻的；浅色的（原级）", "en": "light", "tag": "原级"}, {"cn": "轻的；浅色的（比较级）", "en": "lighter", "tag": "比较级"}, {"cn": "轻的；浅色的（最高级）", "en": "lightest", "tag": "最高级"}, {"cn": "长的；远的（原级）", "en": "long", "tag": "原级"}, {"cn": "长的；远的（比较级）", "en": "longer", "tag": "比较级"}, {"cn": "长的；远的（最高级）", "en": "longest", "tag": "最高级"}, {"cn": "大声的；响亮的（原级）", "en": "loud", "tag": "原级"}, {"cn": "大声的；响亮的（比较级）", "en": "louder", "tag": "比较级"}, {"cn": "大声的；响亮的（最高级）", "en": "loudest", "tag": "最高级"}, {"cn": "低的；矮的；低声的（原级）", "en": "low", "tag": "原级"}, {"cn": "低的；矮的；低声的（比较级）", "en": "lower", "tag": "比较级"}, {"cn": "低的；矮的；低声的（最高级）", "en": "lowest", "tag": "最高级"}, {"cn": "运气好的；侥幸的（原级）", "en": "lucky", "tag": "原级"}, {"cn": "运气好的；侥幸的（比较级）", "en": "luckier", "tag": "比较级"}, {"cn": "运气好的；侥幸的（最高级）", "en": "luckiest", "tag": "最高级"}, {"cn": "许多的（原级）", "en": "many", "tag": "原级"}, {"cn": "许多的（比较级）", "en": "more", "tag": "比较级"}, {"cn": "许多的（最高级）", "en": "most", "tag": "最高级"}, {"cn": "现代的（原级）", "en": "modern", "tag": "原级"}, {"cn": "现代的（比较级）", "en": "more modern", "tag": "比较级"}, {"cn": "现代的（最高级）", "en": "most modern", "tag": "最高级"}, {"cn": "许多的；大量的（原级）", "en": "much", "tag": "原级"}, {"cn": "许多的；大量的（比较级）", "en": "more", "tag": "比较级"}, {"cn": "许多的；大量的（最高级）", "en": "most", "tag": "最高级"}, {"cn": "近的（原级）", "en": "near", "tag": "原级"}, {"cn": "近的（比较级）", "en": "nearer", "tag": "比较级"}, {"cn": "近的（最高级）", "en": "nearest", "tag": "最高级"}, {"cn": "新的；新鲜的（原级）", "en": "new", "tag": "原级"}, {"cn": "新的；新鲜的（比较级）", "en": "newer", "tag": "比较级"}, {"cn": "新的；新鲜的（最高级）", "en": "newest", "tag": "最高级"}, {"cn": "美好的；令人愉快的（原级）", "en": "nice", "tag": "原级"}, {"cn": "美好的；令人愉快的（比较级）", "en": "nicer", "tag": "比较级"}, {"cn": "美好的；令人愉快的（最高级）", "en": "nicest", "tag": "最高级"}, {"cn": "北方的（原级）", "en": "north", "tag": "原级"}, {"cn": "旧的；年老的（原级）", "en": "old", "tag": "原级"}, {"cn": "旧的；年老的（比较级）", "en": "older/elder", "tag": "比较级"}, {"cn": "旧的；年老的（最高级）", "en": "oldest/eldest", "tag": "最高级"}, {"cn": "开着的；开口的（原级）", "en": "open", "tag": "原级"}, {"cn": "橙色的（原级）", "en": "orange", "tag": "原级"}, {"cn": "有礼貌的（原级）", "en": "polite", "tag": "原级"}, {"cn": "有礼貌的（比较级）", "en": "politer", "tag": "比较级"}, {"cn": "有礼貌的（最高级）", "en": "politest", "tag": "最高级"}, {"cn": "贫穷的（原级）", "en": "poor", "tag": "原级"}, {"cn": "贫穷的（比较级）", "en": "poorer", "tag": "比较级"}, {"cn": "贫穷的（最高级）", "en": "poorest", "tag": "最高级"}, {"cn": "流行的（原级）", "en": "popular", "tag": "原级"}, {"cn": "流行的（比较级）", "en": "more popular", "tag": "比较级"}, {"cn": "流行的（最高级）", "en": "most popular", "tag": "最高级"}, {"cn": "可能的，可能发生的（原级）", "en": "possible", "tag": "原级"}, {"cn": "可能的，可能发生的（比较级）", "en": "more possible", "tag": "比较级"}, {"cn": "可能的，可能发生的（最高级）", "en": "most possible", "tag": "最高级"}, {"cn": "快的；迅速的（原级）", "en": "quick", "tag": "原级"}, {"cn": "快的；迅速的（比较级）", "en": "quicker", "tag": "比较级"}, {"cn": "快的；迅速的（最高级）", "en": "quickest", "tag": "最高级"}, {"cn": "安静的（原级）", "en": "quiet", "tag": "原级"}, {"cn": "安静的（比较级）", "en": "quieter", "tag": "比较级"}, {"cn": "安静的（最高级）", "en": "quietest", "tag": "最高级"}, {"cn": "准备好的（原级）", "en": "ready", "tag": "原级"}, {"cn": "红色的（原级）", "en": "red", "tag": "原级"}, {"cn": "富裕的；有钱的（原级）", "en": "rich", "tag": "原级"}, {"cn": "富裕的；有钱的（比较级）", "en": "richer", "tag": "比较级"}, {"cn": "富裕的；有钱的（最高级）", "en": "richest", "tag": "最高级"}, {"cn": "右边的；正确的（原级）", "en": "right", "tag": "原级"}, {"cn": "圆的；球形的（原级）", "en": "round", "tag": "原级"}, {"cn": "圆的；球形的（比较级）", "en": "rounder", "tag": "比较级"}, {"cn": "圆的；球形的（最高级）", "en": "roundest", "tag": "最高级"}, {"cn": "悲伤的；使人悲伤的（原级）", "en": "sad", "tag": "原级"}, {"cn": "悲伤的；使人悲伤的（比较级）", "en": "sadder", "tag": "比较级"}, {"cn": "悲伤的；使人悲伤的（最高级）", "en": "saddest", "tag": "最高级"}, {"cn": "严重的；认真的（原级）", "en": "serious", "tag": "原级"}, {"cn": "严重的；认真的（比较级）", "en": "more serious", "tag": "比较级"}, {"cn": "严重的；认真的（最高级）", "en": "most serious", "tag": "最高级"}, {"cn": "几个；若干（原级）", "en": "several", "tag": "原级"}, {"cn": "短的；矮的（原级）", "en": "short", "tag": "原级"}, {"cn": "短的；矮的（比较级）", "en": "shorter", "tag": "比较级"}, {"cn": "短的；矮的（最高级）", "en": "shortest", "tag": "最高级"}, {"cn": "生病的；有病的（原级）", "en": "sick", "tag": "原级"}, {"cn": "生病的；有病的（比较级）", "en": "sicker", "tag": "比较级"}, {"cn": "生病的；有病的（最高级）", "en": "sickest", "tag": "最高级"}, {"cn": "慢的；缓慢的（原级）", "en": "slow", "tag": "原级"}, {"cn": "慢的；缓慢的（比较级）", "en": "slower", "tag": "比较级"}, {"cn": "慢的；缓慢的（最高级）", "en": "slowest", "tag": "最高级"}, {"cn": "小的；少的（原级）", "en": "small", "tag": "原级"}, {"cn": "小的；少的（比较级）", "en": "smaller", "tag": "比较级"}, {"cn": "小的；少的（最高级）", "en": "smallest", "tag": "最高级"}, {"cn": "对不起的；难过的（原级）", "en": "sorry", "tag": "原级"}, {"cn": "对不起的；难过的（比较级）", "en": "sorrier", "tag": "比较级"}, {"cn": "对不起的；难过的（最高级）", "en": "sorriest", "tag": "最高级"}, {"cn": "强壮的，牢固的（原级）", "en": "strong", "tag": "原级"}, {"cn": "强壮的，牢固的（比较级）", "en": "stronger", "tag": "比较级"}, {"cn": "强壮的，牢固的（最高级）", "en": "strongest", "tag": "最高级"}, {"cn": "确信的（原级）", "en": "sure", "tag": "原级"}, {"cn": "确信的（比较级）", "en": "surer", "tag": "比较级"}, {"cn": "确信的（最高级）", "en": "surest", "tag": "最高级"}, {"cn": "甜的（原级）", "en": "sweet", "tag": "原级"}, {"cn": "甜的（比较级）", "en": "sweeter", "tag": "比较级"}, {"cn": "甜的（最高级）", "en": "sweetest", "tag": "最高级"}, {"cn": "高的（原级）", "en": "tall", "tag": "原级"}, {"cn": "高的（比较级）", "en": "taller", "tag": "比较级"}, {"cn": "高的（最高级）", "en": "tallest", "tag": "最高级"}, {"cn": "可怕的；极不舒服的（原级）", "en": "terrible", "tag": "原级"}, {"cn": "可怕的；极不舒服的（比较级）", "en": "more terrible", "tag": "比较级"}, {"cn": "可怕的；极不舒服的（最高级）", "en": "most terrible", "tag": "最高级"}, {"cn": "瘦的；薄的（原级）", "en": "thin", "tag": "原级"}, {"cn": "瘦的；薄的（比较级）", "en": "thinner", "tag": "比较级"}, {"cn": "瘦的；薄的（最高级）", "en": "thinnest", "tag": "最高级"}, {"cn": "口渴的（原级）", "en": "thirsty", "tag": "原级"}, {"cn": "口渴的（比较级）", "en": "thirstier", "tag": "比较级"}, {"cn": "口渴的（最高级）", "en": "thirstiest", "tag": "最高级"}, {"cn": "疲劳的；累的（原级）", "en": "tired", "tag": "原级"}, {"cn": "疲劳的；累的（比较级）", "en": "more tired", "tag": "比较级"}, {"cn": "疲劳的；累的（最高级）", "en": "most tired", "tag": "最高级"}, {"cn": "真的；真实的（原级）", "en": "true", "tag": "原级"}, {"cn": "真的；真实的（比较级）", "en": "truer", "tag": "比较级"}, {"cn": "真的；真实的（最高级）", "en": "truest", "tag": "最高级"}, {"cn": "有用的；有益的（原级）", "en": "useful", "tag": "原级"}, {"cn": "有用的；有益的（比较级）", "en": "more useful", "tag": "比较级"}, {"cn": "有用的；有益的（最高级）", "en": "most useful", "tag": "最高级"}, {"cn": "暖和的；温暖的（原级）", "en": "warm", "tag": "原级"}, {"cn": "暖和的；温暖的（比较级）", "en": "warmer", "tag": "比较级"}, {"cn": "暖和的；温暖的（最高级）", "en": "warmest", "tag": "最高级"}, {"cn": "差的；弱的（原级）", "en": "weak", "tag": "原级"}, {"cn": "差的；弱的（比较级）", "en": "weaker", "tag": "比较级"}, {"cn": "差的；弱的（最高级）", "en": "weakest", "tag": "最高级"}, {"cn": "湿的；潮的（原级）", "en": "wet", "tag": "原级"}, {"cn": "湿的；潮的（比较级）", "en": "wetter", "tag": "比较级"}, {"cn": "湿的；潮的（最高级）", "en": "wettest", "tag": "最高级"}, {"cn": "西方的（原级）", "en": "west", "tag": "原级"}, {"cn": "白色的（原级）", "en": "white", "tag": "原级"}, {"cn": "白色的（比较级）", "en": "whiter", "tag": "比较级"}, {"cn": "白色的（最高级）", "en": "whitest", "tag": "最高级"}, {"cn": "宽的；宽阔的（原级）", "en": "wide", "tag": "原级"}, {"cn": "宽的；宽阔的（比较级）", "en": "wider", "tag": "比较级"}, {"cn": "宽的；宽阔的（最高级）", "en": "widest", "tag": "最高级"}, {"cn": "极好的；精彩的（原级）", "en": "wonderful", "tag": "原级"}, {"cn": "极好的；精彩的（比较级）", "en": "more wonderful", "tag": "比较级"}, {"cn": "极好的；精彩的（最高级）", "en": "most wonderful", "tag": "最高级"}, {"cn": "错误的；不对的（原级）", "en": "wrong", "tag": "原级"}, {"cn": "黄色的（原级）", "en": "yellow", "tag": "原级"}, {"cn": "年轻的（原级）", "en": "young", "tag": "原级"}, {"cn": "年轻的（比较级）", "en": "younger", "tag": "比较级"}, {"cn": "年轻的（最高级）", "en": "youngest", "tag": "最高级"}]}];
+
+function normalize(s) {
+  return s.toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[.,!?;:"“”]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isCorrect(userInput, answerField) {
+  const user = normalize(userInput);
+  if (!user) return false;
+  const alts = answerField.split('/').map(a => normalize(a));
+  return alts.includes(user);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const setupEl = document.getElementById('setup');
+const quizEl = document.getElementById('quiz');
+const doneEl = document.getElementById('done');
+const deckListEl = document.getElementById('deckList');
+const shuffleOpt = document.getElementById('shuffleOpt');
+
+let state = null;
+
+function renderDeckList() {
+  deckListEl.innerHTML = '';
+  DECKS.forEach((deck, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'deck-btn';
+    btn.innerHTML = `<span>${deck.name}</span><span class="count">${deck.cards.length} 题</span>`;
+    btn.onclick = () => startDeck(idx);
+    deckListEl.appendChild(btn);
+  });
+}
+
+function startDeck(idx, cardsOverride, label) {
+  const deck = DECKS[idx];
+  let cards = cardsOverride
+    ? cardsOverride.map((c) => ({...c}))
+    : deck.cards.map((c, i) => ({...c, id: i}));
+  if (shuffleOpt.checked) cards = shuffle(cards);
+  const isReview = !!cardsOverride;
+  state = {
+    deckIdx: idx,
+    queue: cards,
+    total: cards.length,
+    correct: 0,
+    wrong: 0,
+    current: null,
+    attemptedWrongOnCurrent: false,
+    wrongMap: (isReview && state) ? state.wrongMap : {},
+    isReview: isReview,
+  };
+  setupEl.hidden = true;
+  doneEl.hidden = true;
+  quizEl.hidden = false;
+  document.getElementById('deckTag').textContent = label || deck.name;
+  showAnswerRow();
+  nextCard();
+}
+
+function showAnswerRow() {
+  document.getElementById('answerRow').hidden = false;
+  document.getElementById('nextRow').hidden = true;
+}
+function showNextRow() {
+  document.getElementById('answerRow').hidden = true;
+  document.getElementById('nextRow').hidden = false;
+  document.getElementById('nextBtn').focus();
+}
+
+function nextCard() {
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback';
+  feedback.textContent = '';
+  const input = document.getElementById('answerInput');
+  input.value = '';
+  input.disabled = false;
+  document.getElementById('submitBtn').disabled = false;
+  showAnswerRow();
+
+  if (state.queue.length === 0) {
+    finishDeck();
+    return;
+  }
+  state.current = state.queue[0];
+  state.attemptedWrongOnCurrent = false;
+  document.getElementById('promptCn').textContent = state.current.cn;
+  updateStats();
+  input.focus();
+}
+
+function advanceCard() {
+  state.queue.shift();
+  nextCard();
+}
+
+function updateStats() {
+  document.getElementById('correctCount').textContent = state.correct;
+  document.getElementById('wrongCount').textContent = state.wrong;
+  document.getElementById('remainCount').textContent = state.queue.length;
+  const done = state.total - state.queue.length;
+  document.getElementById('progressText').textContent = `${done} / ${state.total}`;
+  document.getElementById('progressFill').style.width = `${(done / state.total) * 100}%`;
+}
+
+function markWrong(card) {
+  if (!state.attemptedWrongOnCurrent) {
+    state.wrong++;
+    state.attemptedWrongOnCurrent = true;
+    updateStats();
+  }
+  state.wrongMap[card.id] = card;
+}
+
+function markSolved(card) {
+  // answered correctly on first try during an error-review round: it's learned, drop it
+  if (state.isReview) delete state.wrongMap[card.id];
+}
+
+function submitAnswer() {
+  const input = document.getElementById('answerInput');
+  const feedback = document.getElementById('feedback');
+  const val = input.value;
+  if (!val.trim()) return;
+  const card = state.current;
+  if (isCorrect(val, card.en)) {
+    feedback.className = 'feedback good show';
+    feedback.innerHTML = `✓ 正确！ <span class="answer">${card.en}</span>`;
+    if (!state.attemptedWrongOnCurrent) {
+      state.correct++;
+      markSolved(card);
+    }
+    input.disabled = true;
+    updateStats();
+    showNextRow();
+  } else {
+    feedback.className = 'feedback bad show';
+    feedback.innerHTML = `✗ 不对，再试一次`;
+    markWrong(card);
+    input.select();
+  }
+}
+
+function skipCard() {
+  const card = state.current;
+  const feedback = document.getElementById('feedback');
+  feedback.className = 'feedback bad show';
+  feedback.innerHTML = `正确答案： <span class="answer">${card.en}</span> —— 记住它，下次再考`;
+  markWrong(card);
+  document.getElementById('answerInput').disabled = true;
+  showNextRow();
+}
+
+function finishDeck() {
+  quizEl.hidden = true;
+  doneEl.hidden = false;
+  const wrongCards = Object.values(state.wrongMap);
+  const reviewBtn = document.getElementById('reviewBtn');
+  const wrongBook = document.getElementById('wrongBook');
+  const wrongList = document.getElementById('wrongList');
+
+  if (wrongCards.length > 0) {
+    document.getElementById('doneEmoji').textContent = '📝';
+    document.getElementById('doneTitle').textContent = '本轮完成';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次，还有 ${wrongCards.length} 个错题待巩固`;
+    reviewBtn.hidden = false;
+    reviewBtn.textContent = `针对错题再考一次（${wrongCards.length} 题）`;
+    wrongBook.hidden = false;
+    wrongList.innerHTML = wrongCards.map(c =>
+      `<div class="wrong-item"><span class="cn">${c.cn}</span><span class="en">${c.en}</span></div>`
+    ).join('');
+  } else {
+    document.getElementById('doneEmoji').textContent = '🎉';
+    document.getElementById('doneTitle').textContent = state.isReview ? '错题全部攻克！' : '全部完成！';
+    document.getElementById('doneStats').textContent =
+      `共 ${state.total} 题，正确 ${state.correct} 次，出错 ${state.wrong} 次`;
+    reviewBtn.hidden = true;
+    wrongBook.hidden = true;
+  }
+}
+
+document.getElementById('submitBtn').onclick = submitAnswer;
+document.getElementById('skipBtn').onclick = skipCard;
+document.getElementById('nextBtn').onclick = advanceCard;
+document.getElementById('answerInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitAnswer();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !document.getElementById('nextRow').hidden) advanceCard();
+});
+document.getElementById('backBtn').onclick = () => {
+  quizEl.hidden = true;
+  setupEl.hidden = false;
+};
+document.getElementById('restartBtn').onclick = () => startDeck(state.deckIdx);
+document.getElementById('reviewBtn').onclick = () => {
+  const wrongCards = Object.values(state.wrongMap);
+  startDeck(state.deckIdx, wrongCards, `${DECKS[state.deckIdx].name} · 错题重考`);
+};
+document.getElementById('chooseAnotherBtn').onclick = () => {
+  doneEl.hidden = true;
+  setupEl.hidden = false;
+};
+
+renderDeckList();
+</script>
+</body>
+</html>
